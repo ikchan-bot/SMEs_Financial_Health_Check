@@ -6,3 +6,6 @@ openpyxl
 plotly
 joblib
 autogluon
+xgboost
+lightgbm
+catboost
