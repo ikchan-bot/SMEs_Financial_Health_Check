@@ -65,7 +65,7 @@ def load_resources():
         with zipfile.ZipFile(combined_zip_name, 'r') as zip_ref:
             zip_ref.extractall(extract_path)
 
-    # --- ส่วนที่เพิ่มใหม่: เดินหาไฟล์ predictor.pkl ไม่ว่าจะซ่อนอยู่ลึกแค่ไหน ---
+    # เดินหาไฟล์ predictor.pkl ไม่ว่าจะซ่อนอยู่ลึกแค่ไหน
     model_path = extract_path
     found = False
     for root, dirs, files in os.walk(extract_path):
@@ -75,11 +75,10 @@ def load_resources():
             break
             
     if not found:
-        # กรณีหาไม่เจอจริงๆ ให้ลองดูที่ root (เผื่อบางเวอร์ชัน)
         raise FileNotFoundError(f"หาไฟล์ predictor.pkl ไม่เจอใน {extract_path}")
 
-    # โหลดโมเดลจาก path ที่เจอจริงๆ
-    predictor = TabularPredictor.load(model_path)
+    # --- จุดที่แก้: เพิ่ม require_py_version_match=False ---
+    predictor = TabularPredictor.load(model_path, require_py_version_match=False)
     
     # 2.3 โหลดข้อมูลดิบ
     df_raw = pd.read_excel('RawData2.xlsx')
