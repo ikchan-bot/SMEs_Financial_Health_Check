@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS เพื่อความสวยงาม
+# Custom CSS
 st.markdown("""
 <style>
     .metric-card {
@@ -43,32 +43,43 @@ def load_resources():
     kmeans = joblib.load('kmeans_behavior_model.joblib')
     scaler = joblib.load('scaler_behavior.joblib')
     
-    # --- ส่วนที่แก้เพิ่ม: ระบบประกอบร่างไฟล์ Zip ---
+    # 2.2 ระบบประกอบร่างไฟล์ Zip และค้นหาโมเดล (Auto-Finder)
     extract_path = './autogluon_model_extracted'
     combined_zip_name = 'full_model_combined.zip'
     
-    # เช็คว่าแตกไฟล์ไปหรือยัง ถ้ายังให้เริ่มประกอบร่าง
+    # ถ้ายังไม่มีโฟลเดอร์ ให้ทำการแตกไฟล์
     if not os.path.exists(extract_path):
         st.toast("กำลังประกอบร่างโมเดล AI...", icon="🧩")
         
-        # 1. หาไฟล์ส่วนย่อยทั้งหมด (model_part_0.zip, model_part_1.zip ...)
+        # รวมไฟล์ย่อย
         part_files = sorted([f for f in os.listdir('.') if f.startswith('model_part_')])
-        
         if not part_files:
             raise FileNotFoundError("ไม่พบไฟล์ model_part_*.zip กรุณาอัปโหลดไฟล์ย่อยให้ครบ")
 
-        # 2. รวมไฟล์ย่อยเป็นไฟล์ใหญ่
         with open(combined_zip_name, 'wb') as combined_file:
             for part in part_files:
                 with open(part, 'rb') as p:
                     combined_file.write(p.read())
         
-        # 3. แตกไฟล์ใหญ่
+        # แตกไฟล์
         with zipfile.ZipFile(combined_zip_name, 'r') as zip_ref:
             zip_ref.extractall(extract_path)
+
+    # --- ส่วนที่เพิ่มใหม่: เดินหาไฟล์ predictor.pkl ไม่ว่าจะซ่อนอยู่ลึกแค่ไหน ---
+    model_path = extract_path
+    found = False
+    for root, dirs, files in os.walk(extract_path):
+        if 'predictor.pkl' in files:
+            model_path = root
+            found = True
+            break
             
-    # โหลดโมเดลจากโฟลเดอร์ที่แตกแล้ว
-    predictor = TabularPredictor.load(extract_path)
+    if not found:
+        # กรณีหาไม่เจอจริงๆ ให้ลองดูที่ root (เผื่อบางเวอร์ชัน)
+        raise FileNotFoundError(f"หาไฟล์ predictor.pkl ไม่เจอใน {extract_path}")
+
+    # โหลดโมเดลจาก path ที่เจอจริงๆ
+    predictor = TabularPredictor.load(model_path)
     
     # 2.3 โหลดข้อมูลดิบ
     df_raw = pd.read_excel('RawData2.xlsx')
@@ -76,7 +87,7 @@ def load_resources():
     return kmeans, scaler, predictor, df_raw
 
 try:
-    with st.spinner('กำลังโหลดสมอง AI... กรุณารอสักครู่'):
+    with st.spinner('กำลังโหลดสมอง AI... (อาจใช้เวลา 1-2 นาทีในครั้งแรก)'):
         kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
     st.toast("✅ ระบบพร้อมใช้งาน!", icon="🚀")
 except Exception as e:
@@ -139,6 +150,7 @@ if submitted:
         c_color = "#e74c3c" # Red
 
     # --- 4.2 เตรียมข้อมูล Prediction ---
+    # ใช้ค่าเฉลี่ย/ฐานนิยมจากข้อมูลดิบเป็นค่าเริ่มต้น
     pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
     for col in df_raw.columns:
         if col not in ['ID', 'target']:
