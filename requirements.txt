@@ -9,3 +9,6 @@ autogluon
 xgboost
 lightgbm
 catboost
+torch
+fastai
+ipython
