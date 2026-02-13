@@ -147,7 +147,7 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 
 # --- หน้าที่ 1: Landing Page ---
 def show_landing():
-    col1, col2, col3 = st.columns([2, 3])
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.image("https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000", use_container_width=True) # ภาพประกอบแนวการเงิน
         st.markdown('<div class="hero-text">ตรวจเช็คแหล่งเงินทุนของคุณ<br>ในเสี้ยวนาที</div>', unsafe_allow_html=True)
