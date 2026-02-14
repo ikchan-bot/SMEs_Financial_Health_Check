@@ -53,9 +53,9 @@ st.markdown("""
 
     /* 5. ปรับแต่ง Class พิเศษ (จากโค้ดหน้า Landing Page) */
     .hero-text {
-        font-family: 'Kanit', sans-serif; /* หัวข้อใหญ่หน้าแรก */
+        font-family: 'Kanit', sans-serif;
         font-size: 3em;
-        font-weight: 700;
+        font-weight: 400; /* แก้ไข: ปรับจาก 700 เป็น 400 ให้ตัวบางลง */
         color: #1E3A8A;
         text-align: center;
         margin-bottom: 20px;
