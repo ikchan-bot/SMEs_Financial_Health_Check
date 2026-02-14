@@ -17,16 +17,27 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS เพื่อความมินิมอล เรียบหรู (Nomos Style)
+# Custom CSS: หัวข้อ = Kanit, เนื้อหา = Sarabun
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+    /* 1. นำเข้า Font จาก Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Sarabun:wght@300;400;500;700&display=swap');
     
-    html, body, [class*="css"] {
+    /* 2. กำหนด Font พื้นฐาน (เนื้อหา) เป็น Sarabun */
+    html, body, [class*="css"], p, div, label, .stMarkdown, .stTextInput, .stNumberInput, .stSelectbox {
         font-family: 'Sarabun', sans-serif;
         color: #333333;
     }
+
+    /* 3. กำหนด Font หัวข้อ (Header) เป็น Kanit */
+    h1, h2, h3, h4, h5, h6, .stTitle {
+        font-family: 'Kanit', sans-serif !important;
+        font-weight: 600; /* ปรับความหนาให้ดูเด่น */
+    }
+    
+    /* 4. ปรับแต่งปุ่มกด (Button) ให้เป็น Kanit เพื่อความสวยงาม */
     .stButton>button {
+        font-family: 'Kanit', sans-serif !important;
         border-radius: 20px;
         border: 1px solid #333;
         color: #333;
@@ -39,7 +50,10 @@ st.markdown("""
         color: white;
         border-color: #333;
     }
+
+    /* 5. ปรับแต่ง Class พิเศษ (จากโค้ดหน้า Landing Page) */
     .hero-text {
+        font-family: 'Kanit', sans-serif; /* หัวข้อใหญ่หน้าแรก */
         font-size: 3em;
         font-weight: 700;
         color: #1E3A8A;
@@ -47,20 +61,15 @@ st.markdown("""
         margin-bottom: 20px;
     }
     .sub-hero {
+        font-family: 'Sarabun', sans-serif; /* คำโปรยรอง */
         font-size: 1.5em;
         font-weight: 300;
         color: #555;
         text-align: center;
         margin-bottom: 40px;
     }
-    .card {
-        padding: 20px;
-        background-color: #f9f9f9;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        margin-bottom: 20px;
-    }
     .step-indicator {
+        font-family: 'Kanit', sans-serif;
         text-align: center;
         color: #888;
         font-size: 0.9em;
