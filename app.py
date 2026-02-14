@@ -171,7 +171,7 @@ def show_landing():
         st.markdown('<div class="sub-hero">รู้ทันสุขภาพการเงิน | ประเมิน DNA ธุรกิจ | ลดความเสี่ยง | รับคำแนะนำ</div>', unsafe_allow_html=True)
         
         # ปุ่มกดเริ่มประเมิน
-        c_btn1, c_btn2, c_btn3 = st.columns([1, 2])
+        c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
         with c_btn2:
             if st.button("🚀 เริ่มประเมินทันที", type="primary", use_container_width=True):
                 navigate_to('input_step1')
