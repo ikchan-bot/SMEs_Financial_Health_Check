@@ -159,7 +159,7 @@ def show_landing():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.image("FinCheck.jpg", use_container_width=True) # ภาพประกอบแนวการเงิน
-        st.markdown('<div class="hero-text">ตรวจเช็คแหล่งเงินทุนของคุณ<br>ในเสี้ยวนาที</div>', unsafe_allow_html=True)
+        st.markdown('<div class="hero-text">ตรวจเช็คแหล่งเงินทุน<br>ของคุณในเสี้ยวนาที</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-hero">รู้ทันสุขภาพการเงิน | ประเมิน DNA ธุรกิจ | ลดความเสี่ยง | รับคำแนะนำ</div>', unsafe_allow_html=True)
         
         c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
