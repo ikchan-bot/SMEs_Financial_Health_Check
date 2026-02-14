@@ -157,7 +157,7 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # --- หน้าที่ 1: Landing Page ---
 def show_landing():
     # แบ่งหน้าจอ 3 ส่วน (ซ้าย1-กลาง2-ขวา1) เพื่อบีบเนื้อหาเข้ากึ่งกลาง
-    col1, col2, col3 = st.columns([1, 2])
+    col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
         # แสดงรูปภาพ (ตรวจสอบว่าชื่อไฟล์ใน GitHub คือ FinCheck.jpg หรือ cover_image.png ให้ตรงกัน)
