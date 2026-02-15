@@ -154,7 +154,7 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
 
-# --- หน้าที่ 1: Landing Page (ฉบับแก้ไข: เต็มจอ + Font Kanit) ---
+# --- หน้าที่ 1: Landing Page (ฉบับ final: รูปพอดี + เต็มจอ) ---
 def show_landing():
     # 1. ฝัง CSS เพื่อจัดหน้าตาให้สวยงาม (Nomos Style & Font Kanit)
     st.markdown("""
@@ -189,12 +189,14 @@ def show_landing():
         </style>
     """, unsafe_allow_html=True)
 
-    # 2. แสดงรูปภาพ (แบบเต็มจอ ไม่ต้องมี col1, col2 มาบีบ)
-    try:
-        # use_container_width=True จะทำให้รูปขยายเต็มความกว้างของหน้าจอ (ทั้ง PC และมือถือ)
-        st.image("FinCheck.jpg", use_container_width=True) 
-    except:
-        st.error("ไม่พบไฟล์รูปภาพ (กรุณาตรวจสอบว่ามีไฟล์ FinCheck.jpg ในโฟลเดอร์)")
+    # 2. แสดงรูปภาพ (แก้ไขจุดนี้: บีบให้เหลือ 50% ของหน้าจอ)
+    c_img1, c_img2, c_img3 = st.columns([1, 2]) # สัดส่วน ซ้าย1 : กลาง2 : ขวา1
+    
+    with c_img2:
+        try:
+            st.image("FinCheck.jpg", use_container_width=True) 
+        except:
+            st.error("ไม่พบไฟล์รูปภาพ (FinCheck.jpg)")
 
     # 3. แสดงข้อความพาดหัว (Hero Text)
     st.markdown('<div class="hero-title">ตรวจเช็คแหล่งเงินทุน<br>ของคุณในเสี้ยวนาที</div>', unsafe_allow_html=True)
