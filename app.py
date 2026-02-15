@@ -256,20 +256,20 @@ def show_input_step1():
         }
 
         /* --- ปรับแต่งปุ่มกด (Submit Button) --- */
-        /* สถานะปกติ: พื้นขาว กรอบเทา */
+        /* 1. สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือเข้ม */
         div[data-testid="stForm"] button[kind="primary"] {
             background-color: white !important;
-            color: #333 !important;                 /* ตัวอักษรสีเข้ม */
+            color: #333 !important;                 /* ตัวอักษรสีเข้มให้อ่านง่ายบนพื้นขาว */
             border: 2px solid #A9A9A9 !important;   /* กรอบสีเทา */
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
         }
 
-        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว */
+        /* 2. สถานะ Hover: พื้นชมพูจุฬา กรอบเทาเหมือนเดิม ตัวอักษรขาว */
         div[data-testid="stForm"] button[kind="primary"]:hover {
-            background-color: #FF5C8D !important;   /* สีชมพู Chula */
-            border-color: #FF5C8D !important;       /* เปลี่ยนกรอบเป็นสีชมพูด้วย */
-            color: white !important;                /* ตัวอักษรสีขาว */
+            background-color: #FF5C8D !important;   /* เปลี่ยนพื้นเป็นสีชมพู Chula */
+            border: 2px solid #A9A9A9 !important;   /* กรอบยังคงเป็นสีเทา (ตามคำขอ) */
+            color: white !important;                /* เปลี่ยนตัวอักษรเป็นสีขาว */
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
             transform: scale(1.02) !important;
         }
