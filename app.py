@@ -526,7 +526,7 @@ def show_dashboard():
             if 'SIZ' not in pred_df: pred_df['SIZ'] = 1
             if 'YER' not in pred_df: pred_df['YER'] = 10
 
-            prob = predictor_model.predict_proba(pred_df).iloc[2] # โอกาสเกิด Class 1
+            prob = predictor_model.predict_proba(pred_df).iloc[0, 1] # โอกาสเกิด Class 1
         else:
             raise Exception("No Model")
     except:
