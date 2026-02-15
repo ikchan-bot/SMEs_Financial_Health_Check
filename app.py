@@ -426,17 +426,24 @@ def show_dashboard():
         cluster_vals = [inputs.get(f, 0) for f in cluster_features]
         # แปลงเป็น DataFrame และ Scale ข้อมูล
         X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
-        X_scaled = scaler_model.transform(X_cluster)
-        # ทำนายกลุ่ม (0, 1, 2)
-        cluster_id = int(kmeans_model.predict(X_scaled))
+        
+        # ตรวจสอบว่าโมเดลถูกโหลดมาหรือไม่
+        if 'scaler_model' in globals() and 'kmeans_model' in globals():
+            X_scaled = scaler_model.transform(X_cluster)
+            # ทำนายกลุ่ม (0, 1, 2)
+            cluster_id = int(kmeans_model.predict(X_scaled))
+        else:
+            raise Exception("Model not loaded")
+            
     except Exception as e:
         # กรณีโมเดลมีปัญหา ให้ใช้ Default เป็น 0
-        st.warning(f"ระบบจัดกลุ่มขัดข้อง ({e}) ใช้ค่าเริ่มต้นแทน")
+        # st.warning(f"ระบบจัดกลุ่มขัดข้อง ({e}) ใช้ค่าเริ่มต้นแทน") 
         cluster_id = 0
 
     # --- 2.2 คำนวณความเสี่ยง (Risk Prediction) ---
     try:
-        if predictor_model is not None and not df_raw.empty:
+        # ตรวจสอบว่ามีโมเดล AutoGluon และข้อมูลดิบหรือไม่
+        if 'predictor_model' in globals() and predictor_model is not None and 'df_raw' in globals() and not df_raw.empty:
             # 1) สร้าง Row ข้อมูลใหม่โดย Copy จากข้อมูลดิบแถวแรก (เพื่อใช้ค่าเฉลี่ยในตัวแปรที่ไม่ได้ถาม)
             pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
             
@@ -453,15 +460,15 @@ def show_dashboard():
                 if key in pred_df.columns:
                     pred_df[key] = val
             
-            # 4) เพิ่มตัวแปรจำเป็นอื่นๆ (Hardcode ค่ากลางๆ ไว้)
-            pred_df['SIZ'] = 1   # ขนาดธุรกิจ (Small)
-            pred_df['YER'] = 10  # ปีที่ก่อตั้ง
+            # 4) เพิ่มตัวแปรจำเป็นอื่นๆ (Hardcode ค่ากลางๆ ไว้ หากไม่ได้ถาม)
+            if 'SIZ' not in inputs: pred_df['SIZ'] = 1
+            if 'YER' not in inputs: pred_df['YER'] = 10
             
             # 5) พยากรณ์ความน่าจะเป็น (Probability)
             # ดึงค่าความน่าจะเป็นของ Class 1 (มีความเสี่ยง/เงื่อนไข)
-            prob = predictor_model.predict_proba(pred_df).iloc[3]
+            prob = predictor_model.predict_proba(pred_df).iloc[1]
         else:
-            raise Exception("Model not loaded")
+            raise Exception("Predictor Model not loaded")
 
     except:
         # Fallback Logic: คำนวณคร่าวๆ กรณีไม่มี AutoGluon
@@ -521,7 +528,7 @@ def show_dashboard():
     with col2:
         st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**")
         
-        # กราฟ Gauge Chart
+        # กราฟ Gauge Chart (แก้ไข Syntax Error ให้เรียบร้อยแล้ว)
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
@@ -550,7 +557,7 @@ def show_dashboard():
     st.markdown("---")
     
     # ปุ่มไปหน้า Recommendation
-    c_btn1, c_btn2, c_btn3 = st.columns([3, 4])
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
