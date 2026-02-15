@@ -290,7 +290,7 @@ def show_input_step2():
 
             # บันทึกค่าลง Session
             st.session_state.inputs.update({
-                'CAP_NETW': cap_netw, 'CSR3': csr3_val, 'OHR_CAREER': ohr_career_val
+                'CAP_NETW': cap_netw, 'CSR3': csr3_val, 'OHR_CAREER': ohr_career_val,
                 'PRC_CFW': prc_cfw, 'ECO_ADT': eco_adt,
                 'ECM_NET': ecm_net, 'RES_CH': res_ch,
                 
