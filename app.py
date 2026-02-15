@@ -154,37 +154,31 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
 
-# --- หน้าที่ 1: Landing Page (ฉบับ final: รูปพอดี + เต็มจอ) ---
+# --- หน้าที่ 1: Landing Page (ฉบับ Final: รูปพอดีคำ + เต็มจอ) ---
 def show_landing():
-    # 1. ฝัง CSS เพื่อจัดหน้าตาให้สวยงาม (Nomos Style & Font Kanit)
+    # 1. ฝัง CSS (Nomos Style + Font Kanit)
     st.markdown("""
         <style>
-        /* บังคับใช้ฟอนต์ Kanit */
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
-        html, body, [class*="css"] {
-            font-family: 'Kanit', sans-serif;
-        }
+        html, body, [class*="css"] { font-family: 'Kanit', sans-serif; }
         
-        /* ปรับสีหัวข้อและตัวหนา */
-        h1, h2, h3 {
-            color: #1E3A8A !important; /* สีน้ำเงินเข้ม */
-            font-weight: 600;
-        }
+        /* หัวข้อสีน้ำเงินเข้ม */
+        h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
         
-        /* ปรับแต่ง Hero Text (ข้อความพาดหัว) */
+        /* จัด Hero Text ให้น่าสนใจ */
         .hero-title {
-            font-size: 2.5em !important;
+            font-size: 2.8em !important;
             font-weight: bold;
             color: #1E3A8A;
             text-align: center;
-            margin-top: 20px;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-bottom: 5px;
         }
         .hero-subtitle {
-            font-size: 1.2em !important;
+            font-size: 1.3em !important;
             color: #555;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -198,15 +192,14 @@ def show_landing():
         except:
             st.error("ไม่พบไฟล์รูปภาพ (FinCheck.jpg)")
 
-    # 3. แสดงข้อความพาดหัว (Hero Text)
+    # 3. ข้อความ Hero Text
     st.markdown('<div class="hero-title">ตรวจเช็คแหล่งเงินทุน<br>ของคุณในเสี้ยวนาที</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-subtitle">รู้ทันสุขภาพการเงิน | ประเมิน DNA ธุรกิจ | ลดความเสี่ยง | รับคำแนะนำ</div>', unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # 4. ปุ่มกด Start (จัดกึ่งกลางเพื่อให้กดง่าย)
-    # เราใช้ columns ตรงนี้แค่เพื่อให้ปุ่มไม่ยาวจนน่าเกลียด (แต่เนื้อหาข้างบนเต็มจอแล้ว)
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
+    # 4. ปุ่มกด Start (จัดกึ่งกลาง)
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2]) # ใช้สัดส่วนเดียวกับรูปภาพ
     
     with c_btn2:
         if st.button("🚀 เริ่มประเมินทันที (Start)", type="primary", use_container_width=True):
@@ -214,7 +207,7 @@ def show_landing():
 
     st.markdown("---")
 
-    # Footer (เครดิตผู้พัฒนา)
+    # Footer
     st.markdown("""
     <div style='text-align: center; color: #888; font-size: 0.9em; margin-top: 20px;'>
         พัฒนาโดย: <b>นายสมเกียรติ จูสวัสดิ์</b><br>
