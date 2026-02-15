@@ -420,7 +420,6 @@ def show_dashboard():
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
-            # domain = {'x': [2], 'y': [2]},
             gauge = {
                 'axis': {'range': [3], 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"}, # สีเข็ม
