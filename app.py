@@ -357,7 +357,7 @@ def show_input_step2():
             # แก้ไข 3: หัวข้อย่อยเป็นสีน้ำเงิน
             st.markdown("<h5 style='color: #1E3A8A; font-weight: bold;'>การบัญชีและสถานการณ์เศรษฐกิจ</h5>", unsafe_allow_html=True)
             prc_cfw = st.selectbox("กระแสเงินสดเพื่อประกอบธุรกิจและชำระหนี้อยู่ในระดับใด", score_options, index=0)
-            eco_adt = st.selectbox("กิจการของท่านสามารถในการปรับตัวรับสถานการณ์เศรษฐกิจในระดับใด (ECO_ADT)", score_options, index=0)            
+            eco_adt = st.selectbox("กิจการของท่านสามารถในการปรับตัวรับสถานการณ์เศรษฐกิจในระดับใด", score_options, index=0)            
 
         with col3:                  
             # แก้ไข 4: หัวข้อย่อยเป็นสีน้ำเงิน
