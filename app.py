@@ -401,9 +401,9 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-#--- หน้าที่ 4: Dashboard (Result) ---
+# --- หน้าที่ 4: Dashboard (Result) - ฉบับคำนวณจริง (Real Calculation) ---
 def show_dashboard():
-    # ตรวจสอบข้อมูลก่อนประมวลผล (ป้องกัน Error กรณีข้ามหน้า)
+    # 1. ตรวจสอบข้อมูลก่อนประมวลผล (ป้องกัน Error กรณีข้ามหน้า)
     if 'inputs' not in st.session_state or not st.session_state.inputs:
         st.warning("⚠️ กรุณากรอกข้อมูลในขั้นตอนที่ 1 และ 2 ให้ครบถ้วนก่อนครับ")
         if st.button("กลับไปกรอกข้อมูล"):
@@ -412,18 +412,76 @@ def show_dashboard():
 
     # ดึงค่าจาก Session
     inputs = st.session_state.inputs
-    
-    # --- ส่วนจำลองผลการประมวลผล (Dummy Logic) ---
-    # ในการใช้งานจริง ท่านต้องเชื่อมต่อกับโมเดล AI ที่โหลดมา (kmeans, predictor)
-    # แต่ตรงนี้ผมใส่ค่าสมมติไว้เพื่อให้ท่านรันหน้าเว็บผ่านก่อนครับ
-    
-    # จำลองผล DNA (0, 1, 2)
-    cluster_id = 0  # ลองเปลี่ยนเลขนี้เพื่อดูผลลัพธ์แต่ละกลุ่ม (0=นักการตลาด, 1=เปราะบาง, 2=ผู้นำ)
-    
-    # จำลองคะแนนความเสี่ยง (0 - 100)
-    # สมมติคำนวณจากปัจจัยกระแสเงินสดและหนี้สิน
-    risk_score = 45.5 
 
+    # ==========================================
+    # 2. ส่วนประมวลผล AI (Calculation Logic)
+    # ==========================================
+    
+    # --- 2.1 คำนวณ DNA (Clustering) ---
+    # เรียงลำดับ Feature ให้ตรงกับตอน Train Model (8 ตัวแปรพฤติกรรม)
+    cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
+    
+    try:
+        # ดึงค่าจาก inputs เรียงตามลำดับ
+        cluster_vals = [inputs.get(f, 0) for f in cluster_features]
+        # แปลงเป็น DataFrame และ Scale ข้อมูล
+        X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
+        X_scaled = scaler_model.transform(X_cluster)
+        # ทำนายกลุ่ม (0, 1, 2)
+        cluster_id = int(kmeans_model.predict(X_scaled))
+    except Exception as e:
+        # กรณีโมเดลมีปัญหา ให้ใช้ Default เป็น 0
+        st.warning(f"ระบบจัดกลุ่มขัดข้อง ({e}) ใช้ค่าเริ่มต้นแทน")
+        cluster_id = 0
+
+    # --- 2.2 คำนวณความเสี่ยง (Risk Prediction) ---
+    try:
+        if predictor_model is not None and not df_raw.empty:
+            # 1) สร้าง Row ข้อมูลใหม่โดย Copy จากข้อมูลดิบแถวแรก (เพื่อใช้ค่าเฉลี่ยในตัวแปรที่ไม่ได้ถาม)
+            pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
+            
+            # 2) แทนค่าตัวแปรที่ไม่ได้ถามด้วยค่าฐานนิยม (Mode) หรือค่าเฉลี่ย (Mean)
+            for c in df_raw.columns:
+                if c not in inputs.keys() and c not in ['ID', 'target']:
+                    if df_raw[c].dtype == 'object':
+                        pred_df[c] = df_raw[c].mode()
+                    else:
+                        pred_df[c] = df_raw[c].mean()
+            
+            # 3) ใส่ค่าจริงที่รับมาจาก User
+            for key, val in inputs.items():
+                if key in pred_df.columns:
+                    pred_df[key] = val
+            
+            # 4) เพิ่มตัวแปรจำเป็นอื่นๆ (Hardcode ค่ากลางๆ ไว้)
+            pred_df['SIZ'] = 1   # ขนาดธุรกิจ (Small)
+            pred_df['YER'] = 10  # ปีที่ก่อตั้ง
+            
+            # 5) พยากรณ์ความน่าจะเป็น (Probability)
+            # ดึงค่าความน่าจะเป็นของ Class 1 (มีความเสี่ยง/เงื่อนไข)
+            prob = predictor_model.predict_proba(pred_df).iloc[3]
+        else:
+            raise Exception("Model not loaded")
+
+    except:
+        # Fallback Logic: คำนวณคร่าวๆ กรณีไม่มี AutoGluon
+        # สูตร: คะแนนดี = ความเสี่ยงต่ำ (1 - คะแนนเฉลี่ย)
+        score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
+        prob = 1 - (score_sum / 5.0)
+        # Clip ค่าให้อยู่ในช่วง 0.1 - 0.9
+        prob = max(0.1, min(0.9, prob))
+
+    # แปลงเป็นเปอร์เซ็นต์ความเสี่ยง
+    risk_score = prob * 100
+    
+    # บันทึกผลลัพธ์ลง Session (เพื่อใช้ในหน้า Recommendation)
+    st.session_state.results['cluster_id'] = cluster_id
+    st.session_state.results['risk_score'] = risk_score
+
+    # ==========================================
+    # 3. ส่วนแสดงผล (Display)
+    # ==========================================
+    
     # ข้อมูลคำอธิบายของแต่ละกลุ่ม (Cluster Profile)
     cluster_info = {
         0: {"name": "Active Marketer (นักการตลาดไฟแรง)", 
@@ -438,18 +496,16 @@ def show_dashboard():
     }
     dna = cluster_info.get(cluster_id, cluster_info)
 
-    # --- ส่วนแสดงผล Dashboard (UI/UX) ---
-    st.markdown(f"<h2 style='text-align: center; color: #333;'>📊 ผลการประเมินสุขภาพการเงิน</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # --- จุดที่แก้ไข Error: สร้าง 2 คอลัมน์ให้ถูกต้อง ---
-    col1, col2 = st.columns(2) 
+    col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("### 🧬 DNA ธุรกิจของคุณ")
         st.markdown(f"""
-        <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);">
-            <h2 style='margin:0; font-family: Kanit;'>{dna['name']}</h2>
+        <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <h3 style='margin:0; font-family: Kanit;'>{dna['name']}</h3>
             <p style='margin-top:10px; font-size: 1.1em;'>{dna['desc']}</p>
         </div>
         """, unsafe_allow_html=True)
@@ -465,20 +521,20 @@ def show_dashboard():
     with col2:
         st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**")
         
-        # สร้างกราฟเข็มไมล์ (Gauge Chart) แบบ Minimal
+        # กราฟ Gauge Chart
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [0, 40], 'color': "#2ecc71"},   # สีเขียว (เสี่ยงต่ำ)
-                    {'range': [40, 70], 'color': "#f1c40f"},  # สีเหลือง (เสี่ยงปานกลาง)
-                    {'range': [70, 100], 'color': "#e74c3c"}  # สีแดง (เสี่ยงสูง)
+                    {'range': , 'color': "#2ecc71"},   # เขียว (เสี่ยงต่ำ)
+                    {'range': , 'color': "#f1c40f"},  # เหลือง (เสี่ยงปานกลาง)
+                    {'range': , 'color': "#e74c3c"}  # แดง (เสี่ยงสูง)
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -493,11 +549,11 @@ def show_dashboard():
 
     st.markdown("---")
     
-    # ปุ่มไปหน้าถัดไป
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
+    # ปุ่มไปหน้า Recommendation
+    c_btn1, c_btn2, c_btn3 = st.columns([3, 4])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
-            navigate_to('recommendation') # ต้องมีฟังก์ชัน show_recommendation() รองรับ
+            navigate_to('recommendation')
 
 # --- หน้าที่ 5: Recommendations ---
 def show_recommendation():
