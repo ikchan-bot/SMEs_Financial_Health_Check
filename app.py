@@ -194,7 +194,7 @@ def show_landing():
     """, unsafe_allow_html=True)
 
     # 2. แสดงรูปภาพ (บีบให้เหลือ 50% ของหน้าจอ)
-    c_img1, c_img2, c_img3 = st.columns([1, 2]) 
+    c_img1, c_img2, c_img3 = st.columns([1, 2, 1]) 
     with c_img2:
         try:
             st.image("FinCheck.jpg", use_container_width=True) 
@@ -208,7 +208,7 @@ def show_landing():
     st.markdown("---")
 
     # 4. ปุ่มกด Start
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2]) 
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1]) 
     with c_btn2:
         if st.button("🚀 เริ่มประเมินทันที (Start)", type="primary", use_container_width=True):
             navigate_to('input_step1')
