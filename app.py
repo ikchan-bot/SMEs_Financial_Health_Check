@@ -446,37 +446,16 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-# --- หน้าที่ 4: Dashboard (Result) - ฉบับคำนวณจริง + ปรับ UI ---
+# --- หน้าที่ 4: Dashboard (Result) - แก้ไข Logic ความเสี่ยงให้ถูกต้อง ---
 def show_dashboard():
-    # 1. ฝัง CSS (Sarabun + สีปุ่ม Recommendation)
+    # 1. ฝัง CSS (Sarabun + สีปุ่ม)
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
-        
-        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
+        html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
         }
-
-        /* --- ปรับแต่งปุ่มกด (Recommendation Button) --- */
-        /* สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือดำ */
-        div[data-testid="stBaseButton-primary"] > button,
-        button[kind="primary"] {
-            background-color: white !important;
-            color: #333 !important;                 
-            border: 2px solid #A9A9A9 !important;   
-            border-radius: 8px !important;
-            transition: all 0.3s ease !important;
-        }
-
-        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว */
-        div[data-testid="stBaseButton-primary"] > button:hover,
-        button[kind="primary"]:hover {
-            background-color: #FF5C8D !important;   /* สีชมพู Chula */
-            border-color: #FF5C8D !important;       /* กรอบสีชมพู */
-            color: white !important;                
-            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
-            transform: scale(1.02) !important;
-        }
+        h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -489,25 +468,28 @@ def show_dashboard():
 
     inputs = st.session_state.inputs
 
-    # --- ส่วนประมวลผล (Calculation) ---
-    # 1. คำนวณ DNA (Clustering)
+    # ==========================================
+    # 2. ส่วนประมวลผล (Calculation Logic)
+    # ==========================================
+    
+    # --- 2.1 คำนวณ DNA (Clustering) ---
     cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
     try:
         cluster_vals = [inputs.get(f, 0) for f in cluster_features]
-        # ตรวจสอบว่ามี Model หรือไม่
         if 'scaler_model' in globals() and 'kmeans_model' in globals():
             X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
             X_scaled = scaler_model.transform(X_cluster)
             cluster_id = int(kmeans_model.predict(X_scaled))
         else:
-            cluster_id = 0 # Default
+            cluster_id = 0
     except:
         cluster_id = 0
 
-    # 2. คำนวณความเสี่ยง (Risk Prediction)
+    # --- 2.2 คำนวณความเสี่ยง (Risk Prediction) ---
+    # แก้ไข: ดึงค่า Probability ของ Class 1 (ความเสี่ยง) ให้ถูกต้อง
     try:
         if 'predictor_model' in globals() and predictor_model is not None:
-             # สร้างข้อมูลสำหรับพยากรณ์ (ใช้ข้อมูลจริง + ค่าเฉลี่ยส่วนที่ขาด)
+            # เตรียมข้อมูล
             if 'df_raw' in globals() and not df_raw.empty:
                 pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
                 for c in df_raw.columns:
@@ -515,65 +497,68 @@ def show_dashboard():
                         if df_raw[c].dtype == 'object': pred_df[c] = df_raw[c].mode()
                         else: pred_df[c] = df_raw[c].mean()
             else:
-                 # กรณีไม่มีข้อมูลดิบ สร้าง DataFrame เปล่า
                  pred_df = pd.DataFrame([inputs])
                  
-            # ใส่ค่าจริงจาก User
             for k, v in inputs.items():
                 if k in pred_df.columns: pred_df[k] = v
             
-            # เติมค่า Default หากจำเป็น
             if 'SIZ' not in pred_df: pred_df['SIZ'] = 1
             if 'YER' not in pred_df: pred_df['YER'] = 10
 
-            prob = predictor_model.predict_proba(pred_df).iloc[0, 1] # โอกาสเกิด Class 1
+            # ✅ จุดที่แก้ไข: ดึงค่าความน่าจะเป็นของ Class 1 (เสี่ยง/มีข้อจำกัด)
+            # ใช้ [2] เพื่อระบุคอลัมน์ Class 1 และ .iloc เพื่อดึงค่า scalar
+            proba_df = predictor_model.predict_proba(pred_df)
+            if 1 in proba_df.columns:
+                prob = proba_df[2].iloc
+            else:
+                prob = proba_df.iloc # กันเหนียว (แถว 0, คอลัมน์ 1)
+                
         else:
             raise Exception("No Model")
     except:
-        # Fallback Logic (คำนวณสูตรมือ กรณี AI ไม่ทำงาน)
+        # Fallback Logic (คำนวณมือ กรณี Model Error)
         score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
+        # คะแนนน้อย = ความเสี่ยงสูง (1 - คะแนน/5)
         prob = 1 - (score_sum / 5.0)
         prob = max(0.1, min(0.9, prob))
 
+    # แปลงเป็นเปอร์เซ็นต์ (0-100)
     risk_score = prob * 100
-    if 'results' not in st.session_state: st.session_state.results = {}
+    
+    # บันทึกผล
     st.session_state.results['cluster_id'] = cluster_id
     st.session_state.results['risk_score'] = risk_score
 
-    # --- ส่วนแสดงผล (Display) ---
+    # ==========================================
+    # 3. ส่วนแสดงผล (Display)
+    # ==========================================
+    
     cluster_info = {
-        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#f39c12", # ปรับส้มให้เข้มขึ้นให้อ่านง่าย
+        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#f39c12", 
             "desc": "โดดเด่นด้านการตลาดและภาพลักษณ์องค์กร ควรเสริมสร้างระบบเทคโนโลยีและการบริหารความเสี่ยงหลังบ้าน"},
         1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
             "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
         2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", 
             "desc": "ความพร้อมรอบด้าน ทั้งด้านการเงิน การตลาด และการรับมือวิกฤตการณ์ ธนาคารและนักลงทุนพร้อมสนับสนุนแหล่งเงินทุน"}
     }
-    # ป้องกัน Error หาก cluster_id ผิดพลาด
-    dna = cluster_info.get(cluster_id, cluster_info[0])
+    dna = cluster_info.get(cluster_id, cluster_info)
 
-    # หัวข้อหลัก (สีน้ำเงิน)
     st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        # แก้ไข 1: หัวข้อสีน้ำเงิน #1E3A8A
-        st.markdown("<h4 style='color: #1E3A8A; font-weight: bold;'>🧬 DNA ธุรกิจของคุณ</h4>", unsafe_allow_html=True)
-        
+        st.markdown("### 🧬 DNA ธุรกิจของคุณ", unsafe_allow_html=True)
         st.markdown(f"""
         <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style='margin:0; font-family: Sarabun;'>{dna['name']}</h3>
-            <p style='margin-top:10px; font-size: 1.1em;'>{dna['desc']}</p>
+            <h3 style='margin:0; font-family: Sarabun, sans-serif; color: white !important;'>{dna['name']}</h3>
+            <p style='margin-top:10px; font-size: 1.1em; font-family: Sarabun, sans-serif;'>{dna['desc']}</p>
         </div>
         """, unsafe_allow_html=True)
         
-        st.write("") # เว้นบรรทัด
-        
-        # แก้ไข 2: หัวข้อสีน้ำเงิน #1E3A8A
-        st.markdown("<h4 style='color: #1E3A8A; font-weight: bold;'>💡 คำแนะนำเบื้องต้น:</h4>", unsafe_allow_html=True)
-        
+        st.write("")
+        st.markdown("#### 💡 คำแนะนำเบื้องต้น:", unsafe_allow_html=True)
         if cluster_id == 1:
             st.warning("⚠️ **ความเสี่ยงสูง:** ควรเร่งจัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็น")
         elif cluster_id == 0:
@@ -582,23 +567,22 @@ def show_dashboard():
             st.success("✅ **ยอดเยี่ยม:** เครดิตดี เตรียมเอกสารยื่นกู้เพื่อขยายกิจการได้เลย")
 
     with col2:
-        # แก้ไข 3: หัวข้อสีน้ำเงิน #1E3A8A
-        st.markdown(f"<h4 style='color: #1E3A8A; font-weight: bold;'>🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: {risk_score:.1f}%</h4>", unsafe_allow_html=True)
+        st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**", unsafe_allow_html=True)
         
-        # สร้างกราฟเข็มไมล์ (Gauge Chart)
+        # กราฟ Gauge Chart (แก้ไข: สีแดงคือเสี่ยงสูง 70-100)
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [0, 40], 'color': "#2ecc71"},
-                    {'range': [40, 70], 'color': "#f1c40f"},
-                    {'range': [70, 100], 'color': "#e74c3c"}
+                    {'range': , 'color': "#2ecc71"},   # เขียว (0-40) = เสี่ยงต่ำ
+                    {'range': , 'color': "#f1c40f"},  # เหลือง (40-70) = ปานกลาง
+                    {'range': , 'color': "#e74c3c"}  # แดง (70-100) = เสี่ยงสูง
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -614,9 +598,8 @@ def show_dashboard():
     st.markdown("---")
     
     # ปุ่มไปหน้า Recommendation
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
+    c_btn1, c_btn2, c_btn3 = st.columns([0.15, 0.7, 0.15])
     with c_btn2:
-        # ปุ่มนี้จะได้รับผลจาก CSS ด้านบน (ปกติขาว Hover ชมพู)
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
 
