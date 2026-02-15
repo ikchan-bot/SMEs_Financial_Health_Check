@@ -723,19 +723,18 @@ def show_recommendation():
         if st.button("ถัดไป: โปรไฟล์ >", type="primary", use_container_width=True):
             navigate_to('profile')
 
-# --- หน้าที่ 6: Profile & Survey ---
+# --- หน้าที่ 6: Profile & Survey (TAM) ---
 def show_profile():
-    # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู)
+    # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู + ปุ่ม Link)
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
         
-        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div, p {
+        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div, p, a {
             font-family: 'Sarabun', sans-serif !important;
         }
 
-        /* --- ปรับแต่งปุ่มกด (Confirm Button) --- */
-        /* สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือดำ */
+        /* --- ปรับแต่งปุ่มกดทั่วไป (Confirm Button) --- */
         div[data-testid="stForm"] button[kind="secondary"] {
             background-color: white !important;
             color: #333 !important;                 
@@ -743,12 +742,34 @@ def show_profile():
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
         }
-
-        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว */
         div[data-testid="stForm"] button[kind="secondary"]:hover {
             background-color: #FF5C8D !important;   /* สีชมพู Chula */
-            border-color: #A9A9A9 !important;       /* กรอบสีเทาคงเดิม */
+            border-color: #A9A9A9 !important;
             color: white !important;                
+            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
+            transform: scale(1.02) !important;
+        }
+
+        /* --- ปรับแต่งปุ่มลิงก์ (Link Button ไป MS Forms) --- */
+        /* เข้าถึง Element ที่เป็น Link Button */
+        a[data-testid="stLinkButton"] {
+            background-color: white !important;
+            color: #333 !important;
+            border: 2px solid #A9A9A9 !important;
+            border-radius: 8px !important;
+            text-align: center !important;
+            text-decoration: none !important; /* ตัดเส้นใต้ */
+            transition: all 0.3s ease !important;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Link Button Hover */
+        a[data-testid="stLinkButton"]:hover {
+            background-color: #FF5C8D !important;
+            border-color: #A9A9A9 !important;
+            color: white !important;
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
             transform: scale(1.02) !important;
         }
@@ -761,36 +782,36 @@ def show_profile():
     
     with st.form("profile_form"):
         name = st.text_input("ชื่อ-นามสกุล (ระบุหรือไม่ก็ได้)")
-        email = st.text_input("อีเมล (เพื่อรับผลประเมินภายหลัง)")
+        email = st.text_input("อีเมล (เพื่อรับผลประเมิน)")
         
         st.write("") # เว้นบรรทัด
         
-        # ข้อความใหม่ (แทนที่เรื่องบริจาค)
-        st.markdown("### 📝 โปรดทำแบบสอบถามเพื่อให้ความเห็นเกี่ยวกับเครื่องมือที่ท่านทดลองใช้")
-        
-        st.write("") # เว้นบรรทัด
-            
-        # ปุ่มกด (เปลี่ยนชื่อเป็น "ยืนยัน")
+        # ปุ่มยืนยัน (กดแล้วจะโชว์ส่วนขอบคุณ + ปุ่มไป MS Forms)
         submitted = st.form_submit_button("ยืนยัน")
         
-        if submitted:
-            st.balloons() # ลูกโป่งลอย
-            st.success("ขอบพระคุณที่ร่วมเป็นส่วนหนึ่งของงานวิจัย!")
-            
-            # กล่องข้อความใหม่หลังกดส่ง
-            st.markdown(f"""
-            <div style='background-color:#e8f5e9; padding:20px; border-radius:10px; text-align:center; border: 1px solid #c8e6c9;'>
-                <h3 style='color:#2e7d32; margin-bottom:10px;'>🙏 ขอบคุณครับ</h3>
-                <p style='font-size: 1.2em; color:#1b5e20;'>
-                    โปรดทำแบบสอบถามเพื่อให้ความเห็นเกี่ยวกับเครื่องมือที่ท่านทดลองใช้
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # (Optional) หากต้องการปุ่มกลับหน้าแรกอยู่นอก Form
-            # st.write("")
-            # if st.form_submit_button("กลับสู่หน้าแรก"):
-            #     navigate_to('landing')
+    if submitted:
+        st.balloons() # ลูกโป่งลอย
+        st.success("ขอบพระคุณที่ร่วมเป็นส่วนหนึ่งของงานวิจัย!")
+        
+        # กล่องขอบคุณ
+        st.markdown(f"""
+        <div style='background-color:#e8f5e9; padding:20px; border-radius:10px; text-align:center; border: 1px solid #c8e6c9; margin-bottom: 20px;'>
+            <h3 style='color:#2e7d32; margin-bottom:10px;'>🙏 ขอบคุณครับ</h3>
+            <p style='font-size: 1.1em; color:#1b5e20;'>
+                ข้อมูลของท่าน <b>{name if name else ''}</b> ได้ถูกบันทึกแล้ว<br>
+                ขอความกรุณาตอบแบบสอบถามประเมินเครื่องมือ (TAM) ด้านล่าง
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # --- ปุ่มลิงก์ไป MS Forms (ใส่ลิงก์จริงตรงนี้) ---
+        ms_form_url = "https://forms.office.com/r/YOUR_FORM_ID"  # <--- 🔴 ใส่ลิงก์ MS Forms ของคุณตรงนี้ครับ
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.link_button("📝 ทำแบบสอบถามประเมินความพึงพอใจ (TAM)", ms_form_url, use_container_width=True)
 
 # ==========================================
 # 5. Main App Logic
