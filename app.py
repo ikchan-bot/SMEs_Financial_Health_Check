@@ -574,7 +574,7 @@ def show_dashboard():
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
