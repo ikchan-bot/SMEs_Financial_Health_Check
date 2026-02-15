@@ -723,7 +723,7 @@ def show_recommendation():
         if st.button("ถัดไป: โปรไฟล์ >", type="primary", use_container_width=True):
             navigate_to('profile')
 
-# --- หน้าที่ 6: Profile & Survey (TAM) ---
+# --- หน้าที่ 6: Profile & Survey (TAM) - ฉบับแก้ไขข้อความและปุ่ม ---
 def show_profile():
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู + ปุ่ม Link)
     st.markdown("""
@@ -734,7 +734,7 @@ def show_profile():
             font-family: 'Sarabun', sans-serif !important;
         }
 
-        /* --- ปรับแต่งปุ่มกดทั่วไป (Confirm Button) --- */
+        /* --- ปรับแต่งปุ่มกดทั่วไป (ปุ่ม "ยืนยัน" ใน Form) --- */
         div[data-testid="stForm"] button[kind="secondary"] {
             background-color: white !important;
             color: #333 !important;                 
@@ -742,8 +742,9 @@ def show_profile():
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
         }
+        /* Hover: สีชมพูจุฬา ตัวอักษรขาว */
         div[data-testid="stForm"] button[kind="secondary"]:hover {
-            background-color: #FF5C8D !important;   /* สีชมพู Chula */
+            background-color: #FF5C8D !important;   
             border-color: #A9A9A9 !important;
             color: white !important;                
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
@@ -751,21 +752,20 @@ def show_profile():
         }
 
         /* --- ปรับแต่งปุ่มลิงก์ (Link Button ไป MS Forms) --- */
-        /* เข้าถึง Element ที่เป็น Link Button */
         a[data-testid="stLinkButton"] {
             background-color: white !important;
             color: #333 !important;
             border: 2px solid #A9A9A9 !important;
             border-radius: 8px !important;
             text-align: center !important;
-            text-decoration: none !important; /* ตัดเส้นใต้ */
+            text-decoration: none !important;
             transition: all 0.3s ease !important;
             display: inline-flex;
             justify-content: center;
             align-items: center;
         }
         
-        /* Link Button Hover */
+        /* Link Button Hover: สีชมพูจุฬา ตัวอักษรขาว */
         a[data-testid="stLinkButton"]:hover {
             background-color: #FF5C8D !important;
             border-color: #A9A9A9 !important;
@@ -782,11 +782,14 @@ def show_profile():
     
     with st.form("profile_form"):
         name = st.text_input("ชื่อ-นามสกุล (ระบุหรือไม่ก็ได้)")
-        email = st.text_input("อีเมล (เพื่อรับผลประเมิน)")
+        email = st.text_input("อีเมล (เพื่อรับผลประเมินในภายหลัง)")
         
         st.write("") # เว้นบรรทัด
         
-        # ปุ่มยืนยัน (กดแล้วจะโชว์ส่วนขอบคุณ + ปุ่มไป MS Forms)
+        # --- ข้อความสีชมพูจุฬาฯ ก่อนปุ่มยืนยัน ---
+        st.markdown("<p style='color:#FF5C8D; font-weight:bold;'>โปรดกดยืนยันเพื่อตอบแบบสอบถามในลำดับถัดไปครับ</p>", unsafe_allow_html=True)
+        
+        # ปุ่มยืนยัน (CSS จะทำให้ Hover เป็นสีชมพู)
         submitted = st.form_submit_button("ยืนยัน")
         
     if submitted:
@@ -796,22 +799,24 @@ def show_profile():
         # กล่องขอบคุณ
         st.markdown(f"""
         <div style='background-color:#e8f5e9; padding:20px; border-radius:10px; text-align:center; border: 1px solid #c8e6c9; margin-bottom: 20px;'>
-            <h3 style='color:#2e7d32; margin-bottom:10px;'>🙏 ขอบคุณครับ</h3>
+            <h3 style='color:#2e7d32; margin-bottom:10px;'>🙏 ขอความกรุณาตอบแบบสอบถามด้านล่าง</h3>
             <p style='font-size: 1.1em; color:#1b5e20;'>
                 ข้อมูลของท่าน <b>{name if name else ''}</b> ได้ถูกบันทึกแล้ว<br>
-                ขอความกรุณาตอบแบบสอบถามประเมินเครื่องมือ (TAM) ด้านล่าง
+                ขอบคุณครับ
             </p>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
         
-        # --- ปุ่มลิงก์ไป MS Forms (ใส่ลิงก์จริงตรงนี้) ---
-        ms_form_url = "https://forms.office.com/r/YOUR_FORM_ID"  # <--- 🔴 ใส่ลิงก์ MS Forms ของคุณตรงนี้ครับ
+        # --- ปุ่มลิงก์ไป MS Forms (แก้ไขข้อความตามที่ขอ) ---
+        ms_form_url = "https://forms.office.com/r/YOUR_FORM_ID"  # <--- 🔴 อย่าลืมใส่ลิงก์ MS Forms ของคุณตรงนี้นะครับ
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.link_button("📝 ทำแบบสอบถามประเมินความพึงพอใจ (TAM)", ms_form_url, use_container_width=True)
+            # ข้อความปุ่มเปลี่ยนเป็น: "ทำแบบสอบถามแสดงความเห็นต่อเครื่องมือที่ทดลองใช้"
+            # CSS ด้านบนจะทำให้ปุ่มนี้ Hover แล้วเป็นสีชมพู
+            st.link_button("📝 ทำแบบสอบถามแสดงความเห็นต่อเครื่องมือที่ทดลองใช้", ms_form_url, use_container_width=True)
 
 # ==========================================
 # 5. Main App Logic
