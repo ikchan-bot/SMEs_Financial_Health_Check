@@ -247,47 +247,21 @@ def show_landing():
         
 # --- หน้าที่ 2: Input Step 1 (DNA) ---
 def show_input_step1():
-    # 1. ฝัง CSS (Sarabun + บังคับแก้ปุ่ม)
+    # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
     st.markdown("""
         <style>
-        /* บังคับใช้ฟอนต์ Sarabun */
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        
         html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
         }
-
-        /* --- ปรับแต่งปุ่มกด (Submit Button) - ฉบับแก้ไข Force Override --- */
         
-        /* 1. เข้าถึงปุ่ม Primary ทุกตัว (รวมถึงปุ่มใน Form) */
-        button[kind="primary"], 
-        div[data-testid="stBaseButton-primary"] > button {
-            background-color: white !important;     /* บังคับพื้นขาว */
-            border: 2px solid #A9A9A9 !important;   /* บังคับกรอบเทา */
-            color: #333 !important;                 /* ตัวหนังสือสีเข้ม */
-            border-radius: 8px !important;
-            transition: all 0.3s ease !important;
-            box-shadow: none !important;            /* ลบเงาเดิม */
-        }
-
-        /* 2. สถานะ Hover (เอาเมาส์ชี้) */
-        button[kind="primary"]:hover,
-        div[data-testid="stBaseButton-primary"] > button:hover {
-            background-color: #FF5C8D !important;   /* เปลี่ยนพื้นเป็นสีชมพู Chula */
-            border: 2px solid #A9A9A9 !important;   /* กรอบยังคงเป็นสีเทา (ตามที่ขอ) */
-            color: white !important;                /* ตัวอักษรสีขาว */
-            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
-            transform: scale(1.02) !important;
-        }
-        
-        /* 3. สถานะ Active (ตอนกดคลิก) */
-        button[kind="primary"]:active,
-        div[data-testid="stBaseButton-primary"] > button:active {
-            background-color: #D6336C !important;   /* สีเข้มขึ้นนิดนึงตอนกด */
-            color: white !important;
-        }
+        /* ปรับสีหัวข้อให้เป็นสีน้ำเงิน */
+        h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
         </style>
     """, unsafe_allow_html=True)
     
-    # 2. หัวข้อหลัก (เปลี่ยนเป็นสีน้ำเงิน #1E3A8A)
+    # หัวข้อหลัก
     st.markdown("<h3 style='font-family: Sarabun; font-weight: 600; color: #1E3A8A;'>🧬 DNA ธุรกิจท่าน</h3>", unsafe_allow_html=True)
     
     st.info("💡 โปรดทราบ: 0 = ไม่มี, 1 = น้อยที่สุด, 5 = มากที่สุด")
@@ -298,7 +272,6 @@ def show_input_step1():
     with st.form("form_step1"):
         col1, col2, col3 = st.columns(3)
         
-        # --- ใช้ HTML เพื่อกำหนดสีหัวข้อย่อยเป็นสีน้ำเงิน (#1E3A8A) ---
         with col1:
             st.markdown("<h5 style='color: #1E3A8A; font-weight: bold;'>การตลาดและผลิตภัณฑ์</h5>", unsafe_allow_html=True)
             beh_mon = st.selectbox("ท่านติดตามและตรวจสอบความพึงพอใจของลูกค้า", score_options, index=0)
@@ -318,22 +291,18 @@ def show_input_step1():
 
         st.markdown("---")
         
-        # ปุ่ม Submit
-        # หมายเหตุ: ตรงนี้สำคัญ label ต้องตรงกับที่เราอยากได้
+        # ปุ่ม Submit (สีแดงมาตรฐาน)
         submitted = st.form_submit_button("ถัดไป >", type="primary", use_container_width=True)
         
         if submitted:
-            # ตรวจสอบ Session State ก่อนบันทึก
             if 'inputs' not in st.session_state:
                 st.session_state.inputs = {}
 
-            # บันทึกค่าลง Session
             st.session_state.inputs.update({
                 'BEH_MON': beh_mon, 'BRN_IMAGE': brn_image, 'BRN_BRAND': brn_brand,
                 'SAV_VIRUS': sav_virus, 'SAV_PDPA': sav_pdpa, 'CRI_PLN': cri_pln,
                 'POL_BEN': pol_ben, 'POL_ADJ': pol_adj
             })
-            # สั่งเปลี่ยนหน้า
             navigate_to('input_step2')
 
 # --- หน้าที่ 3: Input Step 2 (Business Mgmt) ---
