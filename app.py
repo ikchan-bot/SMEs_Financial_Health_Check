@@ -154,38 +154,47 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
 
-# --- หน้าที่ 1: Landing Page (ฉบับ Final: รูปพอดีคำ + เต็มจอ) ---
+# --- หน้าที่ 1: Landing Page (แก้ไข: ใช้ Font Sarabun ทั้งหมด) ---
 def show_landing():
-    # 1. ฝัง CSS (Nomos Style + Font Kanit)
+    # 1. ฝัง CSS เปลี่ยนเป็น Font Sarabun (สารบรรณ)
     st.markdown("""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
-        html, body, [class*="css"] { font-family: 'Kanit', sans-serif; }
+        /* นำเข้า Font Sarabun จาก Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
         
-        /* หัวข้อสีน้ำเงินเข้ม */
-        h1, h2, h3 { color: #1E3A8A !important; font-weight: 500; }
+        /* บังคับใช้ฟอนต์ Sarabun กับทุกส่วนของเว็บ (รวมถึงปุ่มและ Input) */
+        html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
+            font-family: 'Sarabun', sans-serif !important;
+        }
         
-        /* จัด Hero Text ให้น่าสนใจ */
+        /* ปรับหัวข้อให้เป็นสีน้ำเงินเข้ม */
+        h1, h2, h3 {
+            color: #1E3A8A !important;
+            font-weight: 600;
+        }
+        
+        /* ปรับแต่ง Hero Text */
         .hero-title {
-            font-size: 2.8em !important;
+            font-family: 'Sarabun', sans-serif !important;
+            font-size: 2.5em !important;
             font-weight: bold;
             color: #1E3A8A;
             text-align: center;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
         .hero-subtitle {
-            font-size: 1.3em !important;
+            font-family: 'Sarabun', sans-serif !important;
+            font-size: 1.2em !important;
             color: #555;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # 2. แสดงรูปภาพ (แก้ไขจุดนี้: บีบให้เหลือ 70% ของหน้าจอ)
-    c_img1, c_img2, c_img3 = st.columns([1, 2, 1]) # สัดส่วน ซ้าย1 : กลาง2 : ขวา1
-    
+    # 2. แสดงรูปภาพ (บีบให้เหลือ 50% ของหน้าจอ)
+    c_img1, c_img2, c_img3 = st.columns([1, 2]) 
     with c_img2:
         try:
             st.image("FinCheck.jpg", use_container_width=True) 
@@ -198,9 +207,8 @@ def show_landing():
 
     st.markdown("---")
 
-    # 4. ปุ่มกด Start (จัดกึ่งกลาง)
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1]) # ใช้สัดส่วนเดียวกับรูปภาพ
-    
+    # 4. ปุ่มกด Start
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2]) 
     with c_btn2:
         if st.button("🚀 เริ่มประเมินทันที (Start)", type="primary", use_container_width=True):
             navigate_to('input_step1')
@@ -499,7 +507,7 @@ def show_dashboard():
             }
         ))
         
-        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20), font={'family': "Kanit"})
+        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20), font={'family': "Sarabun"})
         st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
