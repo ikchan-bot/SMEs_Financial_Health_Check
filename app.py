@@ -421,15 +421,15 @@ def show_dashboard():
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [3], 'tickwidth': 1, 'tickcolor': "gray"},
-                'bar': {'color': "darkblue"}, # สีเข็ม
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
+                'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [4], 'color': "#2ecc71"},   # เขียว (เสี่ยงต่ำ/เข้าถึงง่าย)
-                    {'range': [4, 5], 'color': "#f1c40f"},  # เหลือง (ปานกลาง)
-                    {'range': [3, 5], 'color': "#e74c3c"}  # แดง (เสี่ยงสูง/เข้าถึงยาก)
+                    {'range': [0, 40], 'color': "#2ecc71"},   # สีเขียว (เสี่ยงต่ำ)
+                    {'range': [40, 70], 'color': "#f1c40f"},  # สีเหลือง (เสี่ยงปานกลาง)
+                    {'range': [70, 100], 'color': "#e74c3c"}  # สีแดง (เสี่ยงสูง)
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -445,7 +445,7 @@ def show_dashboard():
     st.markdown("---")
     
     # ปุ่มไปหน้าถัดไป
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2])
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation') # ต้องมีฟังก์ชัน show_recommendation() รองรับ
