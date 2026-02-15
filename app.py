@@ -622,7 +622,46 @@ def show_dashboard():
 
 # --- หน้าที่ 5: Recommendations ---
 def show_recommendation():
-    st.markdown("## 🎯 คำแนะนำสำหรับท่าน (Recommendations)")
+    # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู)
+    st.markdown("""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        
+        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
+            font-family: 'Sarabun', sans-serif !important;
+        }
+
+        /* --- ปรับแต่งปุ่มกด (Next Button) --- */
+        /* สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือดำ */
+        div[data-testid="stBaseButton-primary"] > button,
+        button[kind="primary"] {
+            background-color: white !important;
+            color: #333 !important;                 
+            border: 2px solid #A9A9A9 !important;   
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว กรอบเทาเดิม */
+        div[data-testid="stBaseButton-primary"] > button:hover,
+        button[kind="primary"]:hover {
+            background-color: #FF5C8D !important;   /* สีชมพู Chula */
+            border-color: #A9A9A9 !important;       /* กรอบสีเทาเหมือนเดิม */
+            color: white !important;                
+            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
+            transform: scale(1.02) !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # 2. หัวข้อหลัก (สีน้ำเงิน #1E3A8A)
+    st.markdown("<h3 style='color:#1E3A8A; font-weight:bold;'>🎯 คำแนะนำสำหรับท่าน (Recommendations)</h3>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    # ดึงค่า cluster_id
+    if 'results' not in st.session_state:
+        st.session_state.results = {'cluster_id': 0} # Default ป้องกัน Error
+    
     cluster_id = st.session_state.results.get('cluster_id', 0)
     
     # Recommendation Logic (Personalized)
@@ -644,15 +683,21 @@ def show_recommendation():
         }
     }
     
-    rec = recs.get(cluster_id, recs)
+    # ป้องกัน Error
+    rec = recs.get(cluster_id, recs[0])
     
+    # แสดงผล
     st.success(f"✅ **จุดแข็งที่ควรรักษา:** {rec['strength']}")
     st.error(f"⚠️ **สิ่งที่ต้องทำด่วน:** {rec['urgent']}")
     st.info(f"🛡️ **ข้อแนะนำเพิ่มเติม:** {rec['maintain']}")
     
     st.markdown("---")
-    if st.button("ถัดไป: โปรไฟล์ >"):
-        navigate_to('profile')
+    
+    # ปุ่มกดไปหน้า Profile (ใช้ type="primary" เพื่อให้เข้ากับ CSS ด้านบน)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("ถัดไป: โปรไฟล์ >", type="primary", use_container_width=True):
+            navigate_to('profile')
 
 # --- หน้าที่ 6: Profile & Donation ---
 def show_profile():
