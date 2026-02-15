@@ -446,8 +446,40 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-# --- หน้าที่ 4: Dashboard (Result) - ฉบับคำนวณจริง (Real Calculation) ---
+# --- หน้าที่ 4: Dashboard (Result) - ฉบับคำนวณจริง + ปรับ UI ---
 def show_dashboard():
+    # 1. ฝัง CSS (Sarabun + สีปุ่ม Recommendation)
+    st.markdown("""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        
+        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
+            font-family: 'Sarabun', sans-serif !important;
+        }
+
+        /* --- ปรับแต่งปุ่มกด (Recommendation Button) --- */
+        /* สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือดำ */
+        div[data-testid="stBaseButton-primary"] > button,
+        button[kind="primary"] {
+            background-color: white !important;
+            color: #333 !important;                 
+            border: 2px solid #A9A9A9 !important;   
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว */
+        div[data-testid="stBaseButton-primary"] > button:hover,
+        button[kind="primary"]:hover {
+            background-color: #FF5C8D !important;   /* สีชมพู Chula */
+            border-color: #FF5C8D !important;       /* กรอบสีชมพู */
+            color: white !important;                
+            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
+            transform: scale(1.02) !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # ตรวจสอบข้อมูล
     if 'inputs' not in st.session_state or not st.session_state.inputs:
         st.warning("⚠️ กรุณากรอกข้อมูลในขั้นตอนที่ 1 และ 2 ให้ครบถ้วนก่อนครับ")
@@ -504,27 +536,32 @@ def show_dashboard():
         prob = max(0.1, min(0.9, prob))
 
     risk_score = prob * 100
+    if 'results' not in st.session_state: st.session_state.results = {}
     st.session_state.results['cluster_id'] = cluster_id
     st.session_state.results['risk_score'] = risk_score
 
     # --- ส่วนแสดงผล (Display) ---
     cluster_info = {
-        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#f4ef11", 
+        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#f39c12", # ปรับส้มให้เข้มขึ้นให้อ่านง่าย
             "desc": "โดดเด่นด้านการตลาดและภาพลักษณ์องค์กร ควรเสริมสร้างระบบเทคโนโลยีและการบริหารความเสี่ยงหลังบ้าน"},
         1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
             "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
-        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#5ae614", 
+        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", 
             "desc": "ความพร้อมรอบด้าน ทั้งด้านการเงิน การตลาด และการรับมือวิกฤตการณ์ ธนาคารและนักลงทุนพร้อมสนับสนุนแหล่งเงินทุน"}
     }
-    dna = cluster_info.get(cluster_id, cluster_info)
+    # ป้องกัน Error หาก cluster_id ผิดพลาด
+    dna = cluster_info.get(cluster_id, cluster_info[0])
 
+    # หัวข้อหลัก (สีน้ำเงิน)
     st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("color": "#1E3A8A", "### 🧬 DNA ธุรกิจของคุณ")
+        # แก้ไข 1: หัวข้อสีน้ำเงิน #1E3A8A
+        st.markdown("<h4 style='color: #1E3A8A; font-weight: bold;'>🧬 DNA ธุรกิจของคุณ</h4>", unsafe_allow_html=True)
+        
         st.markdown(f"""
         <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style='margin:0; font-family: Sarabun;'>{dna['name']}</h3>
@@ -532,7 +569,11 @@ def show_dashboard():
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("color": "#1E3A8A","#### 💡 คำแนะนำเบื้องต้น:")
+        st.write("") # เว้นบรรทัด
+        
+        # แก้ไข 2: หัวข้อสีน้ำเงิน #1E3A8A
+        st.markdown("<h4 style='color: #1E3A8A; font-weight: bold;'>💡 คำแนะนำเบื้องต้น:</h4>", unsafe_allow_html=True)
+        
         if cluster_id == 1:
             st.warning("⚠️ **ความเสี่ยงสูง:** ควรเร่งจัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็น")
         elif cluster_id == 0:
@@ -541,9 +582,10 @@ def show_dashboard():
             st.success("✅ **ยอดเยี่ยม:** เครดิตดี เตรียมเอกสารยื่นกู้เพื่อขยายกิจการได้เลย")
 
     with col2:
-        st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**")
+        # แก้ไข 3: หัวข้อสีน้ำเงิน #1E3A8A
+        st.markdown(f"<h4 style='color: #1E3A8A; font-weight: bold;'>🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: {risk_score:.1f}%</h4>", unsafe_allow_html=True)
         
-        # สร้างกราฟเข็มไมล์ (Gauge Chart) - ฉบับแก้ไขสมบูรณ์
+        # สร้างกราฟเข็มไมล์ (Gauge Chart)
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
@@ -555,8 +597,8 @@ def show_dashboard():
                 'bordercolor': "gray",
                 'steps': [
                     {'range': [0, 40], 'color': "#2ecc71"},
-                    {'range': [41, 70], 'color': "#f1c40f"},
-                    {'range': [71, 100], 'color': "#e74c3c"}
+                    {'range': [40, 70], 'color': "#f1c40f"},
+                    {'range': [70, 100], 'color': "#e74c3c"}
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -574,6 +616,7 @@ def show_dashboard():
     # ปุ่มไปหน้า Recommendation
     c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
     with c_btn2:
+        # ปุ่มนี้จะได้รับผลจาก CSS ด้านบน (ปกติขาว Hover ชมพู)
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
 
