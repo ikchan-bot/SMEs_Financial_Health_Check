@@ -504,7 +504,7 @@ def show_dashboard():
             value = risk_score,
         gauge = {
             # 1. ระบุแกนหลักว่าเริ่มจาก 0 ถึง 100
-            'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"}, 
+            'axis': {'range': 0, 'tickwidth': 1, 'tickcolor': "gray"}, 
             'bar': {'color': "darkblue"},
             'bgcolor': "white",
             'borderwidth': 2,
