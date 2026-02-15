@@ -448,14 +448,36 @@ def process_results():
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับแก้ไข Syntax Error (วงเล็บครบ) ---
 def show_dashboard():
-    # 1. ฝัง CSS
+    # 1. ฝัง CSS (เพิ่มส่วนตกแต่งปุ่มกด)
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        
         html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
         }
         h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
+
+        /* --- ปรับแต่งปุ่มกดแบบ Primary (ปุ่ม Recommendation) --- */
+        /* สถานะปกติ: พื้นขาว กรอบเทา */
+        div[data-testid="stBaseButton-primary"] > button,
+        button[kind="primary"] {
+            background-color: white !important;
+            color: #333 !important;                 
+            border: 2px solid #A9A9A9 !important;   
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว */
+        div[data-testid="stBaseButton-primary"] > button:hover,
+        button[kind="primary"]:hover {
+            background-color: #FF5C8D !important;   /* สีชมพู Chula */
+            border-color: #FF5C8D !important;       /* กรอบสีชมพู */
+            color: white !important;                
+            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
+            transform: scale(1.02) !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
