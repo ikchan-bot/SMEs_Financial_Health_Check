@@ -17,11 +17,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS: หัวข้อ = Kanit, เนื้อหา = Sarabun
+# Custom CSS: หัวข้อ = Sarabun, เนื้อหา = Sarabun
 st.markdown("""
 <style>
     /* 1. นำเข้า Font จาก Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Sarabun:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Sarabun:wght@300;400;500;700&display=swap');
     
     /* 2. กำหนด Font พื้นฐาน (เนื้อหา) เป็น Sarabun */
     html, body, [class*="css"], p, div, label, .stMarkdown, .stTextInput, .stNumberInput, .stSelectbox {
@@ -29,15 +29,15 @@ st.markdown("""
         color: #333333;
     }
 
-    /* 3. กำหนด Font หัวข้อ (Header) เป็น Kanit */
+    /* 3. กำหนด Font หัวข้อ (Header) เป็น Sarabun */
     h1, h2, h3, h4, h5, h6, .stTitle {
-        font-family: 'Kanit', sans-serif !important;
+        font-family: 'Sarabun', sans-serif !important;
         font-weight: 600; /* ปรับความหนาให้ดูเด่น */
     }
     
-    /* 4. ปรับแต่งปุ่มกด (Button) ให้เป็น Kanit เพื่อความสวยงาม */
+    /* 4. ปรับแต่งปุ่มกด (Button) ให้เป็น Sarabun เพื่อความสวยงาม */
     .stButton>button {
-        font-family: 'Kanit', sans-serif !important;
+        font-family: 'Sarabun', sans-serif !important;
         border-radius: 20px;
         border: 1px solid #333;
         color: #333;
@@ -53,7 +53,7 @@ st.markdown("""
 
     /* 5. ปรับแต่ง Class พิเศษ (จากโค้ดหน้า Landing Page) */
     .hero-text {
-        font-family: 'Kanit', sans-serif;
+        font-family: 'Sarabun', sans-serif;
         font-size: 3em;
         font-weight: 400; /* แก้ไข: ปรับจาก 700 เป็น 400 ให้ตัวบางลง */
         color: #1E3A8A;
@@ -69,7 +69,7 @@ st.markdown("""
         margin-bottom: 40px;
     }
     .step-indicator {
-        font-family: 'Kanit', sans-serif;
+        font-family: 'Sarabun', sans-serif;
         text-align: center;
         color: #888;
         font-size: 0.9em;
@@ -226,8 +226,8 @@ def show_landing():
         
 # --- หน้าที่ 2: Input Step 1 (DNA) ---
 def show_input_step1():
-    # หัวข้อแบบ Font Kanit ตามที่ท่านต้องการ
-    st.markdown("<h3 style='font-family: Kanit, sans-serif; font-weight: 600;'>🧬 DNA ธุรกิจท่าน</h3>", unsafe_allow_html=True)
+    # หัวข้อแบบ Font Sarabun ตามที่ท่านต้องการ
+    st.markdown("<h3 style='font-family: Sarabun, sans-serif; font-weight: 600;'>🧬 DNA ธุรกิจท่าน</h3>", unsafe_allow_html=True)
     
     st.info("💡 โปรดทราบ: 0 = ไม่มี, 1 = น้อยที่สุด, 5 = มากที่สุด")
 
@@ -274,8 +274,8 @@ def show_input_step1():
 def show_input_step2():
     st.markdown('<div class="step-indicator">ขั้นตอนที่ 2/2: ระดับดำเนินงาน</div>', unsafe_allow_html=True)
     
-    # หัวข้อแบบ Font Kanit
-    st.markdown("<h3 style='font-family: Kanit, sans-serif; font-weight: 600;'>💼 ระดับดำเนินงาน</h3>", unsafe_allow_html=True)
+    # หัวข้อแบบ Font Sarabun
+    st.markdown("<h3 style='font-family: Sarabun, sans-serif; font-weight: 600;'>💼 ระดับดำเนินงาน</h3>", unsafe_allow_html=True)
     
     st.info("💡 โปรดเลือกคำตอบ: 0 = ไม่มี, 1 = น้อยที่สุด, 5 = มากที่สุด")
 
@@ -468,7 +468,7 @@ def show_dashboard():
         st.markdown("### 🧬 DNA ธุรกิจของคุณ")
         st.markdown(f"""
         <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style='margin:0; font-family: Kanit;'>{dna['name']}</h3>
+            <h3 style='margin:0; font-family: Sarabun;'>{dna['name']}</h3>
             <p style='margin-top:10px; font-size: 1.1em;'>{dna['desc']}</p>
         </div>
         """, unsafe_allow_html=True)
