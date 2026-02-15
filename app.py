@@ -620,7 +620,7 @@ def show_dashboard():
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
 
-# --- หน้าที่ 5: Recommendations ---
+# --- หน้าที่ 5: Recommendations (ปรับแต่งขนาดตัวอักษรและไอคอน) ---
 def show_recommendation():
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู)
     st.markdown("""
@@ -632,7 +632,6 @@ def show_recommendation():
         }
 
         /* --- ปรับแต่งปุ่มกด (Next Button) --- */
-        /* สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือดำ */
         div[data-testid="stBaseButton-primary"] > button,
         button[kind="primary"] {
             background-color: white !important;
@@ -642,7 +641,6 @@ def show_recommendation():
             transition: all 0.3s ease !important;
         }
 
-        /* สถานะ Hover: พื้นชมพูจุฬา ตัวอักษรขาว กรอบเทาเดิม */
         div[data-testid="stBaseButton-primary"] > button:hover,
         button[kind="primary"]:hover {
             background-color: #FF5C8D !important;   /* สีชมพู Chula */
@@ -660,11 +658,11 @@ def show_recommendation():
 
     # ดึงค่า cluster_id
     if 'results' not in st.session_state:
-        st.session_state.results = {'cluster_id': 0} # Default ป้องกัน Error
+        st.session_state.results = {'cluster_id': 0}
     
     cluster_id = st.session_state.results.get('cluster_id', 0)
     
-    # Recommendation Logic (Personalized)
+    # Recommendation Logic
     recs = {
         0: { # Active Marketer
             "strength": "กิจการของท่านมีความเข้มแข็งด้านการตลาด การสร้างแบรนด์และภาพลักษณ์องค์กร",
@@ -683,17 +681,43 @@ def show_recommendation():
         }
     }
     
-    # ป้องกัน Error
     rec = recs.get(cluster_id, recs[0])
     
-    # แสดงผล
-    st.success(f"✅ **จุดแข็งที่ควรรักษา:** {rec['strength']}")
-    st.error(f"⚠️ **สิ่งที่ต้องทำด่วน:** {rec['urgent']}")
-    st.info(f"🛡️ **ข้อแนะนำเพิ่มเติม:** {rec['maintain']}")
+    # --- แสดงผลแบบ HTML เพื่อปรับขนาดตัวอักษรและไอคอน ---
+    
+    # 1. จุดแข็ง (สีเขียว)
+    st.markdown(f"""
+        <div style="background-color: #d1e7dd; padding: 15px; border-radius: 8px; border: 1px solid #badbcc; margin-bottom: 15px;">
+            <h4 style="color: #0f5132; margin: 0; font-family: Sarabun; font-weight: bold;">✅ จุดแข็งที่ควรรักษา:</h4>
+            <div style="color: #0f5132; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
+                {rec['strength']}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 2. สิ่งที่ต้องทำด่วน (สีแดง)
+    st.markdown(f"""
+        <div style="background-color: #f8d7da; padding: 15px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 15px;">
+            <h4 style="color: #842029; margin: 0; font-family: Sarabun; font-weight: bold;">⚠️ สิ่งที่ต้องทำด่วน:</h4>
+            <div style="color: #842029; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
+                {rec['urgent']}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 3. ข้อแนะนำเพิ่มเติม (สีฟ้า)
+    st.markdown(f"""
+        <div style="background-color: #cff4fc; padding: 15px; border-radius: 8px; border: 1px solid #b6effb; margin-bottom: 15px;">
+            <h4 style="color: #055160; margin: 0; font-family: Sarabun; font-weight: bold;">🛡️ ข้อแนะนำเพิ่มเติม:</h4>
+            <div style="color: #055160; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
+                {rec['maintain']}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # ปุ่มกดไปหน้า Profile (ใช้ type="primary" เพื่อให้เข้ากับ CSS ด้านบน)
+    # ปุ่มกดไปหน้า Profile
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("ถัดไป: โปรไฟล์ >", type="primary", use_container_width=True):
