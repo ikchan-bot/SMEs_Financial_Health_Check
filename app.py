@@ -761,7 +761,7 @@ def show_profile():
     
     with st.form("profile_form"):
         name = st.text_input("ชื่อ-นามสกุล (ระบุหรือไม่ก็ได้)")
-        email = st.text_input("อีเมล (เพื่อรับผลประเมิน)")
+        email = st.text_input("อีเมล (เพื่อรับผลประเมินภายหลัง)")
         
         st.write("") # เว้นบรรทัด
         
