@@ -527,7 +527,7 @@ def show_dashboard():
     st.markdown("---")
     
     # ปุ่มไปหน้า Recommendation
-    c_btn1, c_btn2, c_btn3 = st.columns([2, 3])
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
