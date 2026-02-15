@@ -247,7 +247,7 @@ def show_landing():
         
 # --- หน้าที่ 2: Input Step 1 (DNA) ---
 def show_input_step1():
-    # 1. ฝัง CSS สำหรับหน้านี้โดยเฉพาะ
+    # 1. ฝัง CSS (Sarabun + บังคับแก้ปุ่ม)
     st.markdown("""
         <style>
         /* บังคับใช้ฟอนต์ Sarabun */
@@ -255,23 +255,34 @@ def show_input_step1():
             font-family: 'Sarabun', sans-serif !important;
         }
 
-        /* --- ปรับแต่งปุ่มกด (Submit Button) --- */
-        /* 1. สถานะปกติ: พื้นขาว กรอบเทา ตัวหนังสือเข้ม */
-        div[data-testid="stForm"] button[kind="primary"] {
-            background-color: white !important;
-            color: #333 !important;                 /* ตัวอักษรสีเข้มให้อ่านง่ายบนพื้นขาว */
-            border: 2px solid #A9A9A9 !important;   /* กรอบสีเทา */
+        /* --- ปรับแต่งปุ่มกด (Submit Button) - ฉบับแก้ไข Force Override --- */
+        
+        /* 1. เข้าถึงปุ่ม Primary ทุกตัว (รวมถึงปุ่มใน Form) */
+        button[kind="primary"], 
+        div[data-testid="stBaseButton-primary"] > button {
+            background-color: white !important;     /* บังคับพื้นขาว */
+            border: 2px solid #A9A9A9 !important;   /* บังคับกรอบเทา */
+            color: #333 !important;                 /* ตัวหนังสือสีเข้ม */
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
+            box-shadow: none !important;            /* ลบเงาเดิม */
         }
 
-        /* 2. สถานะ Hover: พื้นชมพูจุฬา กรอบเทาเหมือนเดิม ตัวอักษรขาว */
-        div[data-testid="stForm"] button[kind="primary"]:hover {
+        /* 2. สถานะ Hover (เอาเมาส์ชี้) */
+        button[kind="primary"]:hover,
+        div[data-testid="stBaseButton-primary"] > button:hover {
             background-color: #FF5C8D !important;   /* เปลี่ยนพื้นเป็นสีชมพู Chula */
-            border: 2px solid #A9A9A9 !important;   /* กรอบยังคงเป็นสีเทา (ตามคำขอ) */
-            color: white !important;                /* เปลี่ยนตัวอักษรเป็นสีขาว */
+            border: 2px solid #A9A9A9 !important;   /* กรอบยังคงเป็นสีเทา (ตามที่ขอ) */
+            color: white !important;                /* ตัวอักษรสีขาว */
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
             transform: scale(1.02) !important;
+        }
+        
+        /* 3. สถานะ Active (ตอนกดคลิก) */
+        button[kind="primary"]:active,
+        div[data-testid="stBaseButton-primary"] > button:active {
+            background-color: #D6336C !important;   /* สีเข้มขึ้นนิดนึงตอนกด */
+            color: white !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -307,7 +318,8 @@ def show_input_step1():
 
         st.markdown("---")
         
-        # ปุ่ม Submit (จะแสดงผลตาม CSS ด้านบน: ขาวกรอบเทา -> ชมพู)
+        # ปุ่ม Submit
+        # หมายเหตุ: ตรงนี้สำคัญ label ต้องตรงกับที่เราอยากได้
         submitted = st.form_submit_button("ถัดไป >", type="primary", use_container_width=True)
         
         if submitted:
