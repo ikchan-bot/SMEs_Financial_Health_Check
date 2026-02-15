@@ -446,7 +446,7 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-# --- หน้าที่ 4: Dashboard (Result) - แก้ไข Mapping DNA ให้ถูกต้อง ---
+# --- หน้าที่ 4: Dashboard (Result) - แก้ไข Error และ Mapping ---
 def show_dashboard():
     # 1. ฝัง CSS
     st.markdown("""
@@ -479,7 +479,7 @@ def show_dashboard():
         if 'scaler_model' in globals() and 'kmeans_model' in globals():
             X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
             X_scaled = scaler_model.transform(X_cluster)
-            cluster_id = int(kmeans_model.predict(X_scaled))
+            cluster_id = int(kmeans_model.predict(X_scaled)[0]) # เติม [0] เพื่อดึงค่า int
         else:
             cluster_id = 0
     except:
@@ -505,13 +505,18 @@ def show_dashboard():
 
             # ดึงค่าความเสี่ยง (Class 1)
             proba_df = predictor_model.predict_proba(pred_df)
+            
+            # --- จุดที่แก้ไข (Fix Error) ---
             if 1 in proba_df.columns:
-                prob = proba_df[1].iloc
+                prob = proba_df[1].iloc[0] # ต้องมี [0] เพื่อดึงค่า
             else:
-                prob = proba_df.iloc
+                prob = proba_df.iloc[0, 1] # ดึงแถว 0 คอลัมน์ 1
+            # ---------------------------
+
         else:
             raise Exception("No Model")
     except:
+        # Fallback Logic
         score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
         prob = 1 - (score_sum / 5.0)
         prob = max(0.1, min(0.9, prob))
@@ -525,8 +530,7 @@ def show_dashboard():
     # 3. ส่วนแสดงผล (Display)
     # ==========================================
     
-    # ✅✅✅ แก้ไข Mapping ตรงนี้ (สลับ 0 กับ 1) ✅✅✅
-    # เดิม 0 คือ Active, 1 คือ Potential -> เปลี่ยนใหม่เป็น:
+    # Mapping DNA (0=Potential, 1=Active, 2=Master)
     cluster_info = {
         0: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
             "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
@@ -535,7 +539,11 @@ def show_dashboard():
         2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#99DF1B", 
             "desc": "ความพร้อมรอบด้าน ทั้งด้านการเงิน การตลาด และการรับมือวิกฤตการณ์ ธนาคารและนักลงทุนพร้อมสนับสนุนแหล่งเงินทุน"}
     }
-    dna = cluster_info.get(cluster_id, cluster_info)
+    
+    # --- จุดที่แก้ไข (Fix Error) ---
+    # ถ้าหาไม่เจอ ให้ใช้ตัวที่ 0 เป็น Default ไม่ใช่คืนค่า dict ทั้งก้อน
+    dna = cluster_info.get(cluster_id, cluster_info[0]) 
+    # ---------------------------
 
     st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
@@ -553,7 +561,8 @@ def show_dashboard():
         
         st.write("")
         st.markdown("#### 💡 คำแนะนำเบื้องต้น:", unsafe_allow_html=True)
-        # ปรับ Logic คำแนะนำให้ตรงกับ Mapping ใหม่
+        
+        # Logic คำแนะนำ
         if dna['name'].startswith("Potential"):
             st.warning("⚠️ **ข้อจำกัดสูง:** ควรเร่งจัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็น")
         elif dna['name'].startswith("Active"):
@@ -569,15 +578,15 @@ def show_dashboard():
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [1, 100], 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"}, # แก้ range เป็น 0-100
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
                     {'range': [0, 40], 'color': "#2ecc71"},
-                    {'range': [41, 70], 'color': "#f1c40f"},
-                    {'range': [71,100], 'color': "#e74c3c"}
+                    {'range': [40, 70], 'color': "#f1c40f"},
+                    {'range': [70, 100], 'color': "#e74c3c"}
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
