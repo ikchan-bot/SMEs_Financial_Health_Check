@@ -184,7 +184,7 @@ def show_landing():
     """, unsafe_allow_html=True)
 
     # 2. แสดงรูปภาพ (แก้ไขจุดนี้: บีบให้เหลือ 50% ของหน้าจอ)
-    c_img1, c_img2, c_img3 = st.columns([1, 2]) # สัดส่วน ซ้าย1 : กลาง2 : ขวา1
+    c_img1, c_img2, c_img3 = st.columns([1, 2, 1]) # สัดส่วน ซ้าย1 : กลาง2 : ขวา1
     
     with c_img2:
         try:
