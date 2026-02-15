@@ -509,9 +509,9 @@ def show_dashboard():
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': , 'color': "#2ecc71"},
-                    {'range': , 'color': "#f1c40f"},
-                    {'range': , 'color': "#e74c3c"}
+                    {'range': [0, 40], 'color': "#2ecc71"},
+                    {'range': [41, 70], 'color': "#f1c40f"},
+                    {'range': [71, 100], 'color': "#e74c3c"}
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
