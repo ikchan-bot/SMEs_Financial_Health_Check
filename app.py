@@ -154,26 +154,43 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
 
-# --- หน้าที่ 1: Landing Page (แก้ไข: ใช้ Font Sarabun ทั้งหมด) ---
+# --- หน้าที่ 1: Landing Page (แก้ไข: ปุ่ม Hover สีชมพูจุฬา) ---
 def show_landing():
-    # 1. ฝัง CSS เปลี่ยนเป็น Font Sarabun (สารบรรณ)
+    # 1. ฝัง CSS (Sarabun + Button Styling)
     st.markdown("""
         <style>
-        /* นำเข้า Font Sarabun จาก Google Fonts */
+        /* นำเข้า Font Sarabun */
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
         
-        /* บังคับใช้ฟอนต์ Sarabun กับทุกส่วนของเว็บ (รวมถึงปุ่มและ Input) */
+        /* บังคับใช้ฟอนต์ Sarabun กับทุกส่วนของเว็บ */
         html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
         }
         
-        /* ปรับหัวข้อให้เป็นสีน้ำเงินเข้ม */
-        h1, h2, h3 {
-            color: #1E3A8A !important;
-            font-weight: 600;
+        /* ปรับหัวข้อสีน้ำเงินเข้ม */
+        h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
+        
+        /* --- ส่วนที่เพิ่มใหม่: ตกแต่งปุ่มกด (Start) --- */
+        /* สถานะปกติ */
+        div[data-testid="stBaseButton-primary"] > button, 
+        button[kind="primary"] {
+            transition: all 0.3s ease !important; /* เอฟเฟกต์เปลี่ยนสีนุ่มนวล */
+            border-radius: 8px !important;       /* มุมโค้งมน */
+            border: none !important;
         }
         
-        /* ปรับแต่ง Hero Text */
+        /* สถานะเมื่อเอาเมาส์ไปชี้ (Hover) -> เปลี่ยนเป็นสีชมพูจุฬา */
+        div[data-testid="stBaseButton-primary"] > button:hover,
+        button[kind="primary"]:hover {
+            background-color: #FF5C8D !important; /* สีชมพู (Chula Pink) */
+            border-color: #FF5C8D !important;     /* ขอบสีชมพู */
+            color: white !important;              /* ตัวอักษรสีขาว */
+            box-shadow: 0 4px 15px rgba(255, 92, 141, 0.4) !important; /* เงาสีชมพูฟุ้งๆ */
+            transform: scale(1.05) !important;    /* ขยายใหญ่นิดนึงให้ดูมีมิติ */
+        }
+        /* ---------------------------------- */
+
+        /* Hero Text */
         .hero-title {
             font-family: 'Sarabun', sans-serif !important;
             font-size: 2.5em !important;
@@ -210,6 +227,7 @@ def show_landing():
     # 4. ปุ่มกด Start
     c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1]) 
     with c_btn2:
+        # ปุ่มนี้จะได้รับผลจาก CSS ด้านบน (Hover เป็นสีชมพู)
         if st.button("🚀 เริ่มประเมินทันที (Start)", type="primary", use_container_width=True):
             navigate_to('input_step1')
 
