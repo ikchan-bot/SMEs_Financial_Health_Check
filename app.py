@@ -446,7 +446,7 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-# --- หน้าที่ 4: Dashboard (Result) - แก้ไข Error และ Mapping ---
+# --- หน้าที่ 4: Dashboard (Result) - แก้ไข Mapping ถูกต้อง 100% ---
 def show_dashboard():
     # 1. ฝัง CSS
     st.markdown("""
@@ -479,11 +479,12 @@ def show_dashboard():
         if 'scaler_model' in globals() and 'kmeans_model' in globals():
             X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
             X_scaled = scaler_model.transform(X_cluster)
-            cluster_id = int(kmeans_model.predict(X_scaled)[0]) # เติม [0] เพื่อดึงค่า int
+            # ดึงค่า Cluster ID (0, 1, หรือ 2)
+            cluster_id = int(kmeans_model.predict(X_scaled)[0]) 
         else:
-            cluster_id = 0
+            cluster_id = 1 # Default เป็น 1 (Active) ถ้าโมเดลไม่โหลด
     except:
-        cluster_id = 0
+        cluster_id = 1
 
     # --- 2.2 คำนวณความเสี่ยง (Risk Prediction) ---
     try:
@@ -506,20 +507,21 @@ def show_dashboard():
             # ดึงค่าความเสี่ยง (Class 1)
             proba_df = predictor_model.predict_proba(pred_df)
             
-            # --- จุดที่แก้ไข (Fix Error) ---
             if 1 in proba_df.columns:
-                prob = proba_df[1].iloc[0] # ต้องมี [0] เพื่อดึงค่า
+                prob = proba_df[1].iloc[0] 
             else:
-                prob = proba_df.iloc[0, 1] # ดึงแถว 0 คอลัมน์ 1
-            # ---------------------------
-
+                prob = proba_df.iloc[0, 1]
         else:
             raise Exception("No Model")
     except:
-        # Fallback Logic
-        score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
-        prob = 1 - (score_sum / 5.0)
-        prob = max(0.1, min(0.9, prob))
+        # Fallback Logic (คำนวณสูตรมือ กรณี AI ไม่ทำงาน)
+        # ปรับสูตรให้สอดคล้องกับ Cluster
+        if cluster_id == 1: # Potential (High Risk)
+            prob = 0.85
+        elif cluster_id == 0: # Active (Medium Risk)
+            prob = 0.55
+        else: # Master (Low Risk)
+            prob = 0.25
 
     risk_score = prob * 100
     
@@ -530,20 +532,21 @@ def show_dashboard():
     # 3. ส่วนแสดงผล (Display)
     # ==========================================
     
-    # Mapping DNA (0=Potential, 1=Active, 2=Master)
+    # ✅✅✅ แก้ไข Mapping ให้ถูกต้องตามที่ต้องการ ✅✅✅
+    # 0 = Active Marketer (เหลือง, กลาง)
+    # 1 = Potential Starter (แดง, สูง)
+    # 2 = Master Leader (เขียว, ต่ำ)
     cluster_info = {
-        0: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
-            "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
-        1: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#F9D607", 
+        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#F9D607", 
             "desc": "โดดเด่นด้านการตลาดและภาพลักษณ์องค์กร ควรเสริมสร้างระบบเทคโนโลยีและการบริหารความเสี่ยงหลังบ้าน"},
-        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#99DF1B", 
+        1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
+            "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
+        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", 
             "desc": "ความพร้อมรอบด้าน ทั้งด้านการเงิน การตลาด และการรับมือวิกฤตการณ์ ธนาคารและนักลงทุนพร้อมสนับสนุนแหล่งเงินทุน"}
     }
     
-    # --- จุดที่แก้ไข (Fix Error) ---
-    # ถ้าหาไม่เจอ ให้ใช้ตัวที่ 0 เป็น Default ไม่ใช่คืนค่า dict ทั้งก้อน
+    # ดึงค่า DNA
     dna = cluster_info.get(cluster_id, cluster_info[0]) 
-    # ---------------------------
 
     st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
@@ -554,7 +557,7 @@ def show_dashboard():
         st.markdown("### 🧬 DNA ธุรกิจของคุณ", unsafe_allow_html=True)
         st.markdown(f"""
         <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style='margin:0; font-family: Sarabun, sans-serif; color: white !important;'>{dna['name']}</h3>
+            <h3 style='margin:0; font-family: Sarabun, sans-serif; color: white !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);'>{dna['name']}</h3>
             <p style='margin-top:10px; font-size: 1.1em; font-family: Sarabun, sans-serif;'>{dna['desc']}</p>
         </div>
         """, unsafe_allow_html=True)
@@ -562,10 +565,10 @@ def show_dashboard():
         st.write("")
         st.markdown("#### 💡 คำแนะนำเบื้องต้น:", unsafe_allow_html=True)
         
-        # Logic คำแนะนำ
-        if dna['name'].startswith("Potential"):
+        # Logic คำแนะนำ (อิงตามชื่อ DNA เพื่อความชัวร์)
+        if "Potential" in dna['name']:
             st.warning("⚠️ **ข้อจำกัดสูง:** ควรเร่งจัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็น")
-        elif dna['name'].startswith("Active"):
+        elif "Active" in dna['name']:
             st.info("ℹ️ **ข้อจำกัดปานกลาง:** การตลาดยอดเยี่ยม เข้าใจผู้บริโภค แต่ต้องอุดรูรั่วความปลอดภัยของระบบ IT, PDPA")
         else:
             st.success("✅ **ข้อจำกัดต่ำ:** เครดิตดี เตรียมเอกสารยื่นกู้เพื่อขยายกิจการได้เลย")
@@ -578,15 +581,15 @@ def show_dashboard():
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"}, # แก้ range เป็น 0-100
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [0, 40], 'color': "#2ecc71"},
-                    {'range': [40, 70], 'color': "#f1c40f"},
-                    {'range': [70, 100], 'color': "#e74c3c"}
+                    {'range': [0, 40], 'color': "#2ecc71"},   # เขียว (0-40) Master
+                    {'range': [40, 70], 'color': "#F9D607"},  # เหลือง (40-70) Active
+                    {'range': [70, 100], 'color': "#e74c3c"}  # แดง (70-100) Potential
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
