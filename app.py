@@ -403,102 +403,72 @@ def process_results():
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับคำนวณจริง (Real Calculation) ---
 def show_dashboard():
-    # 1. ตรวจสอบข้อมูลก่อนประมวลผล (ป้องกัน Error กรณีข้ามหน้า)
+    # ตรวจสอบข้อมูล
     if 'inputs' not in st.session_state or not st.session_state.inputs:
         st.warning("⚠️ กรุณากรอกข้อมูลในขั้นตอนที่ 1 และ 2 ให้ครบถ้วนก่อนครับ")
         if st.button("กลับไปกรอกข้อมูล"):
             navigate_to('input_step1')
         return
 
-    # ดึงค่าจาก Session
     inputs = st.session_state.inputs
 
-    # ==========================================
-    # 2. ส่วนประมวลผล AI (Calculation Logic)
-    # ==========================================
-    
-    # --- 2.1 คำนวณ DNA (Clustering) ---
-    # เรียงลำดับ Feature ให้ตรงกับตอน Train Model (8 ตัวแปรพฤติกรรม)
+    # --- ส่วนประมวลผล (Calculation) ---
+    # 1. คำนวณ DNA (Clustering)
     cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
-    
     try:
-        # ดึงค่าจาก inputs เรียงตามลำดับ
         cluster_vals = [inputs.get(f, 0) for f in cluster_features]
-        # แปลงเป็น DataFrame และ Scale ข้อมูล
-        X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
-        
-        # ตรวจสอบว่าโมเดลถูกโหลดมาหรือไม่
+        # ตรวจสอบว่ามี Model หรือไม่
         if 'scaler_model' in globals() and 'kmeans_model' in globals():
+            X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
             X_scaled = scaler_model.transform(X_cluster)
-            # ทำนายกลุ่ม (0, 1, 2)
             cluster_id = int(kmeans_model.predict(X_scaled))
         else:
-            raise Exception("Model not loaded")
-            
-    except Exception as e:
-        # กรณีโมเดลมีปัญหา ให้ใช้ Default เป็น 0
-        # st.warning(f"ระบบจัดกลุ่มขัดข้อง ({e}) ใช้ค่าเริ่มต้นแทน") 
+            cluster_id = 0 # Default
+    except:
         cluster_id = 0
 
-    # --- 2.2 คำนวณความเสี่ยง (Risk Prediction) ---
+    # 2. คำนวณความเสี่ยง (Risk Prediction)
     try:
-        # ตรวจสอบว่ามีโมเดล AutoGluon และข้อมูลดิบหรือไม่
-        if 'predictor_model' in globals() and predictor_model is not None and 'df_raw' in globals() and not df_raw.empty:
-            # 1) สร้าง Row ข้อมูลใหม่โดย Copy จากข้อมูลดิบแถวแรก (เพื่อใช้ค่าเฉลี่ยในตัวแปรที่ไม่ได้ถาม)
-            pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
+        if 'predictor_model' in globals() and predictor_model is not None:
+             # สร้างข้อมูลสำหรับพยากรณ์ (ใช้ข้อมูลจริง + ค่าเฉลี่ยส่วนที่ขาด)
+            if 'df_raw' in globals() and not df_raw.empty:
+                pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
+                for c in df_raw.columns:
+                     if c not in inputs and c not in ['ID', 'target']:
+                        if df_raw[c].dtype == 'object': pred_df[c] = df_raw[c].mode()
+                        else: pred_df[c] = df_raw[c].mean()
+            else:
+                 # กรณีไม่มีข้อมูลดิบ สร้าง DataFrame เปล่า
+                 pred_df = pd.DataFrame([inputs])
+                 
+            # ใส่ค่าจริงจาก User
+            for k, v in inputs.items():
+                if k in pred_df.columns: pred_df[k] = v
             
-            # 2) แทนค่าตัวแปรที่ไม่ได้ถามด้วยค่าฐานนิยม (Mode) หรือค่าเฉลี่ย (Mean)
-            for c in df_raw.columns:
-                if c not in inputs.keys() and c not in ['ID', 'target']:
-                    if df_raw[c].dtype == 'object':
-                        pred_df[c] = df_raw[c].mode()
-                    else:
-                        pred_df[c] = df_raw[c].mean()
-            
-            # 3) ใส่ค่าจริงที่รับมาจาก User
-            for key, val in inputs.items():
-                if key in pred_df.columns:
-                    pred_df[key] = val
-            
-            # 4) เพิ่มตัวแปรจำเป็นอื่นๆ (Hardcode ค่ากลางๆ ไว้ หากไม่ได้ถาม)
-            if 'SIZ' not in inputs: pred_df['SIZ'] = 1
-            if 'YER' not in inputs: pred_df['YER'] = 10
-            
-            # 5) พยากรณ์ความน่าจะเป็น (Probability)
-            # ดึงค่าความน่าจะเป็นของ Class 1 (มีความเสี่ยง/เงื่อนไข)
-            prob = predictor_model.predict_proba(pred_df).iloc[1]
-        else:
-            raise Exception("Predictor Model not loaded")
+            # เติมค่า Default หากจำเป็น
+            if 'SIZ' not in pred_df: pred_df['SIZ'] = 1
+            if 'YER' not in pred_df: pred_df['YER'] = 10
 
+            prob = predictor_model.predict_proba(pred_df).iloc[2] # โอกาสเกิด Class 1
+        else:
+            raise Exception("No Model")
     except:
-        # Fallback Logic: คำนวณคร่าวๆ กรณีไม่มี AutoGluon
-        # สูตร: คะแนนดี = ความเสี่ยงต่ำ (1 - คะแนนเฉลี่ย)
+        # Fallback Logic (คำนวณสูตรมือ กรณี AI ไม่ทำงาน)
         score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
         prob = 1 - (score_sum / 5.0)
-        # Clip ค่าให้อยู่ในช่วง 0.1 - 0.9
         prob = max(0.1, min(0.9, prob))
 
-    # แปลงเป็นเปอร์เซ็นต์ความเสี่ยง
     risk_score = prob * 100
-    
-    # บันทึกผลลัพธ์ลง Session (เพื่อใช้ในหน้า Recommendation)
     st.session_state.results['cluster_id'] = cluster_id
     st.session_state.results['risk_score'] = risk_score
 
-    # ==========================================
-    # 3. ส่วนแสดงผล (Display)
-    # ==========================================
-    
-    # ข้อมูลคำอธิบายของแต่ละกลุ่ม (Cluster Profile)
+    # --- ส่วนแสดงผล (Display) ---
     cluster_info = {
-        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", 
-            "color": "#f1c40f", # เหลือง
+        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#f1c40f", 
             "desc": "โดดเด่นด้านการตลาดและการสร้างแบรนด์ แต่ขาดระบบจัดการความเสี่ยงและเทคโนโลยีหลังบ้าน"},
-        1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", 
-            "color": "#e74c3c", # แดง
+        1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
             "desc": "กลุ่มเปราะบางที่ต้องเร่งสร้างวินัยทางการเงินและวางระบบบัญชีโดยด่วน เพื่อเพิ่มโอกาสเข้าถึงทุน"},
-        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", 
-            "color": "#2ecc71", # เขียว
+        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", 
             "desc": "มีความพร้อมรอบด้าน ทั้งการเงิน การตลาด และแผนรับมือวิกฤต เป็นกลุ่มเป้าหมายหลักของธนาคาร"}
     }
     dna = cluster_info.get(cluster_id, cluster_info)
@@ -528,20 +498,21 @@ def show_dashboard():
     with col2:
         st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**")
         
-        # กราฟ Gauge Chart (แก้ไข Syntax Error ให้เรียบร้อยแล้ว)
+        # กราฟ Gauge Chart (แก้ไขให้แล้ว)
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
             gauge = {
+                # ✅ ใส่  ให้เรียบร้อย
                 'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': , 'color': "#2ecc71"},   # เขียว (เสี่ยงต่ำ)
-                    {'range': , 'color': "#f1c40f"},  # เหลือง (เสี่ยงปานกลาง)
-                    {'range': , 'color': "#e74c3c"}  # แดง (เสี่ยงสูง)
+                    {'range': , 'color': "#2ecc71"},   
+                    {'range': , 'color': "#f1c40f"}, 
+                    {'range': , 'color': "#e74c3c"} 
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -557,7 +528,7 @@ def show_dashboard():
     st.markdown("---")
     
     # ปุ่มไปหน้า Recommendation
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2])
+    c_btn1, c_btn2, c_btn3 = st.columns([2, 3])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
