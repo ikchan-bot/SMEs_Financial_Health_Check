@@ -498,29 +498,27 @@ def show_dashboard():
     with col2:
         st.markdown(f"### 🔮 ความเสี่ยงการเข้าถึงแหล่งเงิน: **{risk_score:.1f}%**")
         
-        # กราฟ Gauge Chart (แก้ไขให้แล้ว)
+        # สร้างกราฟเข็มไมล์ (Gauge Chart) - ฉบับแก้ไขสมบูรณ์
         fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_score,
-        gauge = {
-            # 1. ระบุแกนหลักว่าเริ่มจาก 0 ถึง 100
-            'axis': {'range': 0, 'tickwidth': 1, 'tickcolor': "gray"}, 
-            'bar': {'color': "darkblue"},
-            'bgcolor': "white",
-            'borderwidth': 2,
-            'bordercolor': "gray",
-            'steps': [
-                # 2. ระบุช่วงสีของเกณฑ์ความเสี่ยง (เขียว/เหลือง/แดง)
-                {'range': [0], [40] 'color': "#2ecc71"},   # สีเขียว (0-40 คะแนน)
-                {'range': [41], [70] 'color': "#f1c40f"},  # สีเหลือง (40-70 คะแนน)
-                {'range': [71], [100] 'color': "#e74c3c"}  # สีแดง (70-100 คะแนน)
-            ],
-            'threshold': {
-                'line': {'color': "black", 'width': 4},
-                'thickness': 0.75,
-                'value': risk_score
+            gauge = {
+                'axis': {'range': , 'tickwidth': 1, 'tickcolor': "gray"},
+                'bar': {'color': "darkblue"},
+                'bgcolor': "white",
+                'borderwidth': 2,
+                'bordercolor': "gray",
+                'steps': [
+                    {'range': , 'color': "#2ecc71"},
+                    {'range': , 'color': "#f1c40f"},
+                    {'range': , 'color': "#e74c3c"}
+                ],
+                'threshold': {
+                    'line': {'color': "black", 'width': 4},
+                    'thickness': 0.75,
+                    'value': risk_score
+                }
             }
-        }
         ))
         
         fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20), font={'family': "Kanit"})
