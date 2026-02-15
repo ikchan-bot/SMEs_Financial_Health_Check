@@ -446,7 +446,7 @@ def process_results():
         
     st.session_state.results['risk_prob'] = prob
 
-# --- หน้าที่ 4: Dashboard (Result) - แก้ไข KeyError และตรวจสอบ Mapping ---
+# --- หน้าที่ 4: Dashboard (Result) - แก้ไข KeyError เรียบร้อย ---
 def show_dashboard():
     # 1. ฝัง CSS
     st.markdown("""
@@ -472,64 +472,34 @@ def show_dashboard():
     # 2. ส่วนประมวลผล (Calculation Logic)
     # ==========================================
     
-    # --- 2.1 คำนวณ DNA (Clustering) ---
+    # 2.1 คำนวณคะแนนรวม DNA (Total Score Calculation)
     cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
-    try:
-        cluster_vals = [inputs.get(f, 0) for f in cluster_features]
-        if 'scaler_model' in globals() and 'kmeans_model' in globals():
-            X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
-            X_scaled = scaler_model.transform(X_cluster)
-            # ดึงค่า Cluster ID
-            cluster_id = int(kmeans_model.predict(X_scaled))
-        else:
-            cluster_id = 0
-    except:
-        cluster_id = 0
-
-    # --- 2.2 คำนวณความเสี่ยงเบื้องต้น (Raw Probability) ---
-    raw_prob = 0.5
-    try:
-        if 'predictor_model' in globals() and predictor_model is not None:
-            if 'df_raw' in globals() and not df_raw.empty:
-                pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
-                for c in df_raw.columns:
-                     if c not in inputs and c not in ['ID', 'target']:
-                        if df_raw[c].dtype == 'object': pred_df[c] = df_raw[c].mode()
-                        else: pred_df[c] = df_raw[c].mean()
-            else:
-                 pred_df = pd.DataFrame([inputs])
-                 
-            for k, v in inputs.items():
-                if k in pred_df.columns: pred_df[k] = v
-            
-            if 'SIZ' not in pred_df: pred_df['SIZ'] = 1
-            if 'YER' not in pred_df: pred_df['YER'] = 10
-
-            proba_df = predictor_model.predict_proba(pred_df)
-            if 1 in proba_df.columns:
-                raw_prob = proba_df[2].iloc
-            else:
-                raw_prob = proba_df.iloc[2]
-        else:
-            score_sum = inputs.get('PRC_CFW', 0)*0.4 + inputs.get('CAP_NETW', 0)*0.3 + inputs.get('BEH_MON', 0)*0.3
-            raw_prob = 1 - (score_sum / 5.0)
-    except:
-        raw_prob = 0.5
-
-    # --- 2.3 บังคับช่วงคะแนนตามกลุ่ม (Score Normalization) ---
-    # 0 = Potential Starter (เสี่ยงสูง)
-    # 1 = Active Marketer (ปานกลาง)
-    # 2 = Master Leader (เสี่ยงต่ำ)
     
-    if cluster_id == 0: 
-        risk_score = 71 + (raw_prob * 29) # ช่วง 71-100
-    elif cluster_id == 1: 
-        risk_score = 41 + (raw_prob * 29) # ช่วง 41-70
-    else: 
-        risk_score = raw_prob * 40 # ช่วง 0-40
-
-    risk_score = min(100, max(0, risk_score))
+    # รวมคะแนน (Score 0-40)
+    total_score = sum([inputs.get(f, 0) for f in cluster_features])
     
+    # กำหนด Logic การแบ่งกลุ่มตามคะแนน (Thresholds)
+    if total_score <= 15:
+        cluster_id = 1  # Potential Starter (แดง)
+        # คำนวณ % ความเสี่ยงในช่วง 71-100%
+        risk_score = 100 - (total_score * (29/15)) 
+        risk_score = max(71, min(100, risk_score))
+        
+    elif total_score <= 29:
+        cluster_id = 0  # Active Marketer (เหลือง)
+        # คำนวณ % ความเสี่ยงในช่วง 41-70%
+        normalized_score = total_score - 16
+        risk_score = 70 - (normalized_score * (29/13))
+        risk_score = max(41, min(70, risk_score))
+        
+    else:
+        cluster_id = 2  # Master Leader (เขียว)
+        # คำนวณ % ความเสี่ยงในช่วง 0-40%
+        normalized_score = total_score - 30
+        risk_score = 40 - (normalized_score * (40/10))
+        risk_score = max(0, min(40, risk_score))
+
+    # บันทึกผลลัพธ์
     st.session_state.results['cluster_id'] = cluster_id
     st.session_state.results['risk_score'] = risk_score
 
@@ -537,19 +507,20 @@ def show_dashboard():
     # 3. ส่วนแสดงผล (Display)
     # ==========================================
     
+    # Mapping DNA
     cluster_info = {
-        0: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", 
-            "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
-        1: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#F9D607", 
+        0: {"name": "Active Marketer (นักการตลาดไฟแรง)", "color": "#F9D607", # เหลือง (กลาง)
             "desc": "โดดเด่นด้านการตลาดและภาพลักษณ์องค์กร ควรเสริมสร้างระบบเทคโนโลยีและการบริหารความเสี่ยงหลังบ้าน"},
-        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", 
+        1: {"name": "Potential Starter (นักสู้ผู้มีศักยภาพ)", "color": "#e74c3c", # แดง (สูง)
+            "desc": "มีความยืดหยุ่น ควรสร้างวินัยทางการเงินและวางระบบบัญชีให้น่าเชื่อถือ เพื่อเพิ่มโอกาสเข้าถึงแหล่งเงินทุน"},
+        2: {"name": "Master Leader (ผู้นำระดับมาสเตอร์)", "color": "#2ecc71", # เขียว (ต่ำ)
             "desc": "ความพร้อมรอบด้าน ทั้งด้านการเงิน การตลาด และการรับมือวิกฤตการณ์ ธนาคารและนักลงทุนพร้อมสนับสนุนแหล่งเงินทุน"}
     }
     
-    # ✅ แก้ไขจุดที่ Error: เปลี่ยนเลข 3 เป็น 0
-    dna = cluster_info.get(cluster_id, cluster_info)
+    # ✅ แก้ไขจุดที่ Error: เปลี่ยนเลข 3 เป็นเลข 1 (Potential) เป็นค่า Default
+    dna = cluster_info.get(cluster_id, cluster_info[1])
 
-    st.markdown(f"📊 ผลการประเมินสุขภาพการเงิน", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align:center; color:#1E3A8A;'>📊 ผลการประเมินสุขภาพการเงิน</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns(2)
@@ -558,7 +529,7 @@ def show_dashboard():
         st.markdown("### 🧬 DNA ธุรกิจของคุณ", unsafe_allow_html=True)
         st.markdown(f"""
         <div style="background-color: {dna['color']}; padding: 20px; border-radius: 10px; color: white; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style='margin:0; font-family: Sarabun, sans-serif; color: white !important;'>{dna['name']}</h3>
+            <h3 style='margin:0; font-family: Sarabun, sans-serif; color: white !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);'>{dna['name']}</h3>
             <p style='margin-top:10px; font-size: 1.1em; font-family: Sarabun, sans-serif;'>{dna['desc']}</p>
         </div>
         """, unsafe_allow_html=True)
@@ -566,11 +537,12 @@ def show_dashboard():
         st.write("")
         st.markdown("#### 💡 คำแนะนำเบื้องต้น:", unsafe_allow_html=True)
         
-        if cluster_id == 0:
+        # Logic คำแนะนำ
+        if cluster_id == 1: # Potential (แดง)
             st.warning("⚠️ **ข้อจำกัดสูง:** ควรเร่งจัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็น")
-        elif cluster_id == 1:
+        elif cluster_id == 0: # Active (เหลือง)
             st.info("ℹ️ **ข้อจำกัดปานกลาง:** การตลาดยอดเยี่ยม เข้าใจผู้บริโภค แต่ต้องอุดรูรั่วความปลอดภัยของระบบ IT, PDPA")
-        else:
+        else: # Master (เขียว)
             st.success("✅ **ข้อจำกัดต่ำ:** เครดิตดี เตรียมเอกสารยื่นกู้เพื่อขยายกิจการได้เลย")
 
     with col2:
@@ -581,15 +553,15 @@ def show_dashboard():
             mode = "gauge+number",
             value = risk_score,
             gauge = {
-                'axis': {'range': [3], 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [4], 'color': "#2ecc71"},
-                    {'range': [4, 5], 'color': "#F9D607"},
-                    {'range': [3, 5], 'color': "#e74c3c"}
+                    {'range': [0, 40], 'color': "#2ecc71"},   # เขียว (0-40) Master
+                    {'range': [40, 70], 'color': "#F9D607"},  # เหลือง (40-70) Active
+                    {'range': [70, 100], 'color': "#e74c3c"}  # แดง (70-100) Potential
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -607,7 +579,7 @@ def show_dashboard():
     c_btn1, c_btn2, c_btn3 = st.columns([0.15, 0.7, 0.15])
     with c_btn2:
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
-            navigate_to('recommendation')
+            navigate_to('recommendation'
 
 # --- หน้าที่ 5: Recommendations (ปรับแต่งขนาดตัวอักษรและไอคอน) ---
 def show_recommendation():
