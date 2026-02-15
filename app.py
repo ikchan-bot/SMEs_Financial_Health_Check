@@ -254,20 +254,20 @@ def show_input_step1():
         with col1:
             st.markdown("**การตลาดและผลิตภัณฑ์**")
             # ใช้ score_options ที่กำหนดไว้ถูกต้องแล้ว (จะไม่ Error ตรง index=0)
-            beh_mon = st.selectbox("ท่านติดตามและตรวจสอบความพึงพอใจของลูกค้า (BEH_MON)", score_options, index="0")
-            brn_image = st.selectbox("ท่านให้ความสำคัญกับภาพลักษณ์องค์กร (BRN_IMAGE)", score_options, index="0")
-            brn_brand = st.selectbox("การรับรู้และความน่าเชื่อถือของแบรนด์ของท่าน (BRN_BRAND)", score_options, index="0")
+            beh_mon = st.selectbox("ท่านติดตามและตรวจสอบความพึงพอใจของลูกค้า (BEH_MON)", score_options, index=0)
+            brn_image = st.selectbox("ท่านให้ความสำคัญกับภาพลักษณ์องค์กร (BRN_IMAGE)", score_options, index=0)
+            brn_brand = st.selectbox("การรับรู้และความน่าเชื่อถือของแบรนด์ของท่าน (BRN_BRAND)", score_options, index=0)
         
         with col2:
             st.markdown("**เทคโนโลยีและการรับมือสถานการณ์**")
-            sav_virus = st.selectbox("การอัพเดทโปรแกรมป้องกันไวรัสเพื่อความปลอดภัย (SAV_VIRUS)", score_options, index="0")
-            sav_pdpa = st.selectbox("ท่านปฏิบัติตามกฎหมาย PDPA เพื่อรักษาข้อมูลลูกค้า (SAV_PDPA)", score_options, index="0")
-            cri_pln = st.selectbox("ท่านมีแผนรองรับวิกฤตการณ์ต่าง ๆ เช่น สงคราม โรคระบาด ซ้อมหนีไฟ เป็นต้น (CRI_PLN)", score_options, index="0")
+            sav_virus = st.selectbox("การอัพเดทโปรแกรมป้องกันไวรัสเพื่อความปลอดภัย (SAV_VIRUS)", score_options, index=0)
+            sav_pdpa = st.selectbox("ท่านปฏิบัติตามกฎหมาย PDPA เพื่อรักษาข้อมูลลูกค้า (SAV_PDPA)", score_options, index=0)
+            cri_pln = st.selectbox("ท่านมีแผนรองรับวิกฤตการณ์ต่าง ๆ เช่น สงคราม โรคระบาด ซ้อมหนีไฟ เป็นต้น (CRI_PLN)", score_options, index=0)
 
         with col3:
             st.markdown("**ภาครัฐ**")
-            pol_ben = st.selectbox("ท่านได้รับประโยชน์จากนโยบายภาครัฐ (POL_BEN)", score_options, index="0")
-            pol_adj = st.selectbox("ท่านสามารถปรับรูปแบบธุรกิจให้สอดคล้องนโยบายรัฐ (POL_ADJ)", score_options, index="0")
+            pol_ben = st.selectbox("ท่านได้รับประโยชน์จากนโยบายภาครัฐ (POL_BEN)", score_options, index=0)
+            pol_adj = st.selectbox("ท่านสามารถปรับรูปแบบธุรกิจให้สอดคล้องนโยบายรัฐ (POL_ADJ)", score_options, index=0)
 
         st.markdown("---")
         
