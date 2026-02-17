@@ -220,11 +220,11 @@ def show_landing():
 
     # 3. ข้อความ Hero Text (แก้ไขตามที่ขอ)
     # บรรทัดบน: สีน้ำเงินเข้ม ฟอนต์ Sarabun (ตาม Class เดิม)
-    # บรรทัดล่าง: SME FinCheck เป็นสีชมพูจุฬาฯ (#FE5C8D) และฟอนต์ Jost แบบบาง (Weight 400)
+    # บรรทัดล่าง: SME FinCheck เป็นสีชมพูจุฬาฯ (#FE5C8D) และฟอนต์ Jost แบบบาง (Weight 500)
     st.markdown("""
         <div class="hero-title">
             พยากรณ์แหล่งเงินทุนด้วย<br>
-            <span style='font-family: "Jost", sans-serif; font-weight: 600; color: #FE5C8D; font-size: 1.1em;'>SME FinCheck</span>
+            <span style='font-family: "Jost", sans-serif; font-weight: 500; color: #FE5C8D; font-size: 1.1em;'>SME FinCheck</span>
         </div>
     """, unsafe_allow_html=True)
     
