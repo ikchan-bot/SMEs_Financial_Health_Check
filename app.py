@@ -222,7 +222,7 @@ def show_landing():
             st.error("ไม่พบไฟล์รูปภาพ (FinCheck.jpg)")
 
     # 3. ข้อความ Hero Text
-    st.markdown('<div class="hero-title">ตรวจเช็คแหล่งเงินทุน<br>ด้วย SME FinCheck</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">พยากรณ์แหล่งเงินทุนด้วย<br>SME FinCheck</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-subtitle">รู้ทันสุขภาพการเงิน | ประเมิน DNA ธุรกิจ | ลดความเสี่ยง | รับคำแนะนำ</div>', unsafe_allow_html=True)
 
     st.markdown("---")
