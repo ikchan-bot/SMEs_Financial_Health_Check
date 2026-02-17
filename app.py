@@ -11,7 +11,7 @@ from autogluon.tabular import TabularPredictor
 # 1. ตั้งค่าหน้าเว็บและธีม (NOMOS Style)
 # ==========================================
 st.set_page_config(
-    page_title="SME Fin Health Check",
+    page_title="SME FinCheck",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="collapsed"
