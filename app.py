@@ -193,7 +193,7 @@ def show_landing():
         .hero-title {
             font-family: 'Sarabun', sans-serif !important;
             font-size: 2.5em !important;
-            font-weight: regular;
+            font-weight: bold;
             color: #1E3A8A;
             text-align: center;
             margin-top: 20px;
@@ -224,7 +224,7 @@ def show_landing():
     st.markdown("""
         <div class="hero-title">
             พยากรณ์แหล่งเงินทุนด้วย<br>
-            <span style='font-family: "Jost", sans-serif; font-weight: 400; color: #FE5C8D; font-size: 1.1em;'>SME FinCheck</span>
+            <span style='font-family: "Jost", sans-serif; font-weight: 600; color: #FE5C8D; font-size: 1.1em;'>SME FinCheck</span>
         </div>
     """, unsafe_allow_html=True)
     
