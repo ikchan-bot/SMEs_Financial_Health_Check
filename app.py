@@ -193,7 +193,7 @@ def show_landing():
         .hero-title {
             font-family: 'Sarabun', sans-serif !important;
             font-size: 2.5em !important;
-            font-weight: bold;
+            font-weight: regular;
             color: #1E3A8A;
             text-align: center;
             margin-top: 20px;
