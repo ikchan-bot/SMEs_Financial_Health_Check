@@ -154,15 +154,15 @@ kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
 
-# --- หน้าที่ 1: Landing Page (แก้ไข: กรอบเทาตลอดเวลา + Hover สีชมพู) ---
+# --- หน้าที่ 1: Landing Page (แก้ไข: SME FinCheck เป็น Jost Light สีชมพู + ปุ่มมีกรอบเทา) ---
 def show_landing():
-    # 1. ฝัง CSS (Sarabun + Button Styling)
+    # 1. ฝัง CSS (Sarabun + Jost + Button Styling)
     st.markdown("""
         <style>
-        /* นำเข้า Font Sarabun */
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        /* นำเข้า Font: Sarabun (ไทย) และ Jost (อังกฤษ) */
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;600&family=Sarabun:wght@300;400;600&display=swap');
         
-        /* บังคับใช้ฟอนต์ Sarabun กับทุกส่วนของเว็บ */
+        /* บังคับใช้ฟอนต์ Sarabun กับทุกส่วนของเว็บเป็นหลัก */
         html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
         }
@@ -170,28 +170,24 @@ def show_landing():
         /* ปรับหัวข้อสีน้ำเงินเข้ม */
         h1, h2, h3 { color: #1E3A8A !important; font-weight: 600; }
         
-        /* --- ส่วนที่เพิ่มใหม่: ตกแต่งปุ่มกด (Start) --- */
+        /* --- ส่วนตกแต่งปุ่มกด (Start) --- */
         /* 1. สถานะปกติ (มีกรอบเทาตลอดเวลา) */
         div[data-testid="stBaseButton-primary"] > button, 
         button[kind="primary"] {
             transition: all 0.3s ease !important;
             border-radius: 8px !important;
-            
-            /* --- จุดที่แก้ไข: ใส่กรอบสีเทาไว้ตรงนี้เลย เพื่อให้โชว์ตลอดเวลา --- */
-            border: 2px solid #A9A9A9 !important; 
-            /* ----------------------------------------------------------- */
+            border: 2px solid #A9A9A9 !important; /* กรอบสีเทา */
         }
         
         /* 2. สถานะเมื่อเอาเมาส์ไปชี้ (Hover) -> เปลี่ยนพื้นหลังเป็นสีชมพู */
         div[data-testid="stBaseButton-primary"] > button:hover,
         button[kind="primary"]:hover {
-            background-color: #FF5C8D !important;  /* พื้นหลังเปลี่ยนเป็นสีชมพูจุฬา */
-            border-color: #A9A9A9 !important;     /* กรอบยังคงเป็นสีเทาเหมือนเดิม */
+            background-color: #FE5C8D !important;  /* สีชมพูจุฬาฯ */
+            border-color: #A9A9A9 !important;     /* กรอบยังคงเป็นสีเทา */
             color: white !important;              /* ตัวอักษรสีขาว */
-            box-shadow: 0 4px 15px rgba(255, 92, 141, 0.4) !important;
+            box-shadow: 0 4px 15px rgba(254, 92, 141, 0.4) !important;
             transform: scale(1.05) !important;
         }
-        /* ---------------------------------- */
 
         /* Hero Text */
         .hero-title {
@@ -202,6 +198,7 @@ def show_landing():
             text-align: center;
             margin-top: 20px;
             margin-bottom: 10px;
+            line-height: 1.3;
         }
         .hero-subtitle {
             font-family: 'Sarabun', sans-serif !important;
@@ -214,23 +211,30 @@ def show_landing():
     """, unsafe_allow_html=True)
 
     # 2. แสดงรูปภาพ (บีบให้เหลือ 50% ของหน้าจอ)
-    c_img1, c_img2, c_img3 = st.columns([1, 2, 1]) 
+    c_img1, c_img2, c_img3 = st.columns([1, 2]) 
     with c_img2:
         try:
             st.image("FinCheck.jpg", use_container_width=True) 
         except:
             st.error("ไม่พบไฟล์รูปภาพ (FinCheck.jpg)")
 
-    # 3. ข้อความ Hero Text
-    st.markdown('<div class="hero-title">พยากรณ์แหล่งเงินทุนด้วย<br>SME FinCheck</div>', unsafe_allow_html=True)
+    # 3. ข้อความ Hero Text (แก้ไขตามที่ขอ)
+    # บรรทัดบน: สีน้ำเงินเข้ม ฟอนต์ Sarabun (ตาม Class เดิม)
+    # บรรทัดล่าง: SME FinCheck เป็นสีชมพูจุฬาฯ (#FE5C8D) และฟอนต์ Jost แบบบาง (Weight 300)
+    st.markdown("""
+        <div class="hero-title">
+            พยากรณ์แหล่งเงินทุนด้วย<br>
+            <span style='font-family: "Jost", sans-serif; font-weight: 300; color: #FE5C8D; font-size: 1.3em;'>SME FinCheck</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown('<div class="hero-subtitle">รู้ทันสุขภาพการเงิน | ประเมิน DNA ธุรกิจ | ลดความเสี่ยง | รับคำแนะนำ</div>', unsafe_allow_html=True)
 
     st.markdown("---")
 
     # 4. ปุ่มกด Start
-    c_btn1, c_btn2, c_btn3 = st.columns([1, 2, 1]) 
+    c_btn1, c_btn2, c_btn3 = st.columns([1, 2]) 
     with c_btn2:
-        # ปุ่มนี้จะได้รับผลจาก CSS ด้านบน
         if st.button("🚀 เริ่มประเมินทันที (Start)", type="primary", use_container_width=True):
             navigate_to('input_step1')
 
