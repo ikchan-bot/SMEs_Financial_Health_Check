@@ -224,7 +224,7 @@ def show_landing():
     st.markdown("""
         <div class="hero-title">
             พยากรณ์แหล่งเงินทุนด้วย<br>
-            <span style='font-family: "Jost", sans-serif; font-weight: 300; color: #FE5C8D; font-size: 1.3em;'>SME FinCheck</span>
+            <span style='font-family: "Jost", sans-serif; font-weight: 400; color: #FE5C8D; font-size: 1.0em;'>SME FinCheck</span>
         </div>
     """, unsafe_allow_html=True)
     
