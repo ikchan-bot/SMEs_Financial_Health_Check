@@ -371,17 +371,9 @@ def show_input_step2():
 
         st.markdown("---")
 
-        # --- ส่วนปุ่มกด ---
-        col_b1, col_b2 = st.columns(2)
-        
-        with col_b1:
-            # ปุ่มย้อนกลับ
-            if st.form_submit_button("< ย้อนกลับ", type="secondary", use_container_width=True):
-                navigate_to('input_step1')
-                
-        with col_b2:
-            # ปุ่มประเมินผลลัพธ์
-            submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
+    # --- ส่วนปุ่มกด (แก้ไข: ลบปุ่มย้อนกลับออก) ---
+    # แสดงปุ่มประเมินผลลัพธ์แบบเต็มความกว้าง
+    submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
             
         if submitted:
             # แปลงค่า
