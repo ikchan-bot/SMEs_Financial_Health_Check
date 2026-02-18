@@ -5,6 +5,7 @@ import joblib
 import zipfile
 import os
 import plotly.graph_objects as go
+import streamlit.components.v1 as components
 from autogluon.tabular import TabularPredictor
 
 # ==========================================
@@ -150,6 +151,18 @@ def load_resources():
 # โหลดทรัพยากร
 kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 
+# --- ฟังก์ชันสั่งเลื่อนหน้าจอขึ้นบนสุด ---
+def scroll_to_top():
+    js = """
+        <script>
+            var body = window.parent.document.querySelector(".main");
+            console.log(body);
+            body.scrollTop = 0;
+            window.scrollTo(0, 0);
+        </script>
+    """
+    components.html(js, height=0)
+
 # ==========================================
 # 4. ส่วนแสดงผล (Page Views)
 # ==========================================
@@ -251,6 +264,8 @@ def show_landing():
         
 # --- หน้าที่ 2: Input Step 1 (DNA) ---
 def show_input_step1():
+    scroll_to_top()
+    
     # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
     st.markdown("""
         <style>
@@ -311,6 +326,8 @@ def show_input_step1():
 
 # --- หน้าที่ 3: Input Step 2 (Business Mgmt) ---
 def show_input_step2():
+    scroll_to_top()
+    
     # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
     st.markdown("""
         <style>
@@ -444,6 +461,8 @@ def process_results():
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับแก้ไข Syntax Error (วงเล็บครบ) ---
 def show_dashboard():
+    scroll_to_top()
+    
     # 1. ฝัง CSS (เพิ่มส่วนตกแต่งปุ่มกด)
     st.markdown("""
         <style>
@@ -601,6 +620,8 @@ def show_dashboard():
 
 # --- หน้าที่ 5: Recommendations (ปรับแต่งขนาดตัวอักษรและไอคอน) ---
 def show_recommendation():
+    scroll_to_top()
+    
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู)
     st.markdown("""
         <style>
@@ -704,6 +725,8 @@ def show_recommendation():
 
 # --- หน้าที่ 6: Profile & Survey (TAM) - ฉบับแก้ไขข้อความและปุ่ม ---
 def show_profile():
+    scroll_to_top()
+    
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู + ปุ่ม Link)
     st.markdown("""
         <style>
