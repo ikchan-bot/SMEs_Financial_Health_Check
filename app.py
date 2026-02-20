@@ -429,7 +429,7 @@ def process_results():
     if predictor_model is not None and not df_raw.empty:
         try:
             # 2.1 สร้างตาราง 1 แถวโดยจำลองโครงสร้างจาก df_raw (รักษารูปแบบ Data Type เดิมเป๊ะ)
-            pred_df = df_raw.iloc[].copy().reset_index(drop=True)
+            pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
             
             # 2.2 เคลียร์ข้อมูลแถวแรกเป็นค่าว่างทั้งหมด เพื่อให้ AutoGluon จัดการ Imputation เอง 100%
             for col in pred_df.columns:
