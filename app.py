@@ -151,14 +151,21 @@ def load_resources():
 # โหลดทรัพยากร
 kmeans_model, scaler_model, predictor_model, df_raw = load_resources()
 
-# --- ฟังก์ชันสั่งเลื่อนหน้าจอขึ้นบนสุด ---
+# --- ฟังก์ชันสั่งเลื่อนหน้าจอขึ้นบนสุด (อัปเดตแก้ปัญหาหน้า 4 ไม่เลื่อน) ---
 def scroll_to_top():
     js = """
         <script>
-            var body = window.parent.document.querySelector(".main");
-            console.log(body);
-            body.scrollTop = 0;
-            window.scrollTo(0, 0);
+            // หน่วงเวลา 0.15 วินาที (150ms) เพื่อรอให้ Streamlit วาดหน้าจอให้เสร็จก่อน
+            setTimeout(function() {
+                // 1. สั่งเลื่อนหน้าต่างหลัก (Window)
+                window.parent.scrollTo(0, 0);
+                
+                // 2. สั่งเลื่อนกรอบเนื้อหาของ Streamlit (ครอบคลุมทั้งคอมพิวเตอร์และมือถือ)
+                var containers = window.parent.document.querySelectorAll('.main, .block-container, .stApp');
+                for (var i = 0; i < containers.length; i++) {
+                    containers[i].scrollTop = 0;
+                }
+            }, 150); 
         </script>
     """
     components.html(js, height=0)
