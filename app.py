@@ -236,7 +236,7 @@ def show_landing():
     # บรรทัดล่าง: SME FinCheck เป็นสีชมพูจุฬาฯ (#FE5C8D) และฟอนต์ Jost แบบบาง (Weight 500)
     st.markdown("""
         <div class="hero-title">
-            พยากรณ์แหล่งเงินทุนด้วย<br>
+            ตรวจสุขภาพธุรกิจและการเงินด้วย<br>
             <span style='font-family: "Jost", sans-serif; font-weight: 500; color: #FE5C8D; font-size: 1.1em;'>SME FinCheck</span>
         </div>
     """, unsafe_allow_html=True)
