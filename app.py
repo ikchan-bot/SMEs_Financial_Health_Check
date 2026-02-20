@@ -427,54 +427,38 @@ def show_input_step2():
             # ไปหน้า Dashboard
             navigate_to('dashboard')
 
-# --- ฟังก์ชันประมวลผล (Processing Logic) ---
-def process_results():
-    inputs = st.session_state.inputs
-    
-    # 1. Clustering Logic
-    cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
-    cluster_vals = [inputs[f] for f in cluster_features]
-    
-    try:
-        # Scale & Predict
-        X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
-        X_scaled = scaler_model.transform(X_cluster)
-        cluster_id = kmeans_model.predict(X_scaled)
-    except:
-        cluster_id = 0 # Default if model fails
-        
-    st.session_state.results['cluster_id'] = cluster_id
-
     # 2. Prediction Logic (AutoGluon)
     if predictor_model is not None and not df_raw.empty:
-        # สร้าง Row ข้อมูลใหม่จากค่าเฉลี่ย (Imputation Strategy)
+        # สร้าง Row ข้อมูลใหม่จากแถวแรก และรีเซ็ต Index ให้เป็น 0
         pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
 
         # แทนค่าเฉลี่ย/ฐานนิยมในคอลัมน์ที่ไม่ได้ถาม
         for c in df_raw.columns:
             if c not in inputs.keys() and c not in ['ID', 'target']:
                 if str(df_raw[c].dtype) == 'object':
-                    # ✅ แก้ไขจุดที่ 1: เติม  เพื่อดึงค่า mode ค่าแรกค่าเดียว
-                    if not df_raw[c].mode().empty:
-                        pred_df.loc[0, c] = df_raw[c].mode()
+                    mode_series = df_raw[c].mode()
+                    if not mode_series.empty:
+                        # ✅ แก้ไข: ดึงเฉพาะค่าแรก (iloc) เพื่อให้เป็นค่าเดี่ยว (Scalar) ป้องกัน Error
+                        pred_df.at[0, c] = mode_series.iloc
                 else:
-                    pred_df.loc[0, c] = df_raw[c].mean()
+                    # ค่าเฉลี่ยเป็นค่าเดี่ยวอยู่แล้ว
+                    pred_df.at[0, c] = df_raw[c].mean()
 
         # ใส่ค่าที่รับมาจาก User
         for key, val in inputs.items():
             if key in pred_df.columns:
-                pred_df.loc[0, key] = val
+                pred_df.at[0, key] = val
 
-        # เพิ่ม SIZ และ YER (สมมติค่า Default หรือถามเพิ่มได้ ถ้าจำเป็น)
-        pred_df.loc[0, 'SIZ'] = 1 # Default Small
-        pred_df.loc[0, 'YER'] = 10 # Default Established
+        # เพิ่ม SIZ และ YER (สมมติค่า Default)
+        pred_df.at[0, 'SIZ'] = 1 # Default Small
+        pred_df.at[0, 'YER'] = 10 # Default Established
 
         # Predict Class 1 Probability
         try:
             # รับค่าผลลัพธ์เป็นตาราง
             prob_df = predictor_model.predict_proba(pred_df)
                 
-            # ✅ แก้ไขจุดที่ 2: ระบุแถวแรก (Index 0) ให้ชัดเจน ป้องกัน Error Out of bounds
+            # ✅ แก้ไข: ดึงค่าเดี่ยว (Scalar) อย่างปลอดภัยด้วย iloc เสมอ
             if 1 in prob_df.columns:
                 prob = float(prob_df[1].iloc)
             elif '1' in prob_df.columns:
@@ -484,18 +468,9 @@ def process_results():
                 prob = float(prob_df.iloc[1])
 
         except Exception as e:
-            # ✅ ให้โชว์ Error บนหน้าจอ หากมีปัญหาอื่นซ่อนอยู่จะได้เห็นชัดเจน
+            # โชว์ Error บนหน้าจอ หากมีปัญหาอื่นซ่อนอยู่
             st.error(f"🚨 ข้อผิดพลาดจากการพยากรณ์: {e}")
             prob = 0.5 # Fallback
-            
-    else:
-        # Logic จำลองกรณีไม่มีไฟล์โมเดล (สำหรับการแสดงผล Demo)
-        score = inputs['PRC_CFW'] * 0.4 + inputs['CAP_NETW'] * 0.3 + inputs['BEH_MON'] * 0.3
-        prob = 1 - (score / 5.0) # คะแนนเยอะ ความเสี่ยงน้อย
-        
-    st.session_state.results['risk_prob'] = prob
-    # ✅ แปลงความน่าจะเป็น (0.0 - 1.0) เป็นเปอร์เซ็นต์ (0 - 100) เพื่อส่งให้กราฟเข็มไมล์
-    st.session_state.results['risk_score'] = float(prob) * 100
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับแก้ไข Syntax Error (วงเล็บครบ) ---
 def show_dashboard():
