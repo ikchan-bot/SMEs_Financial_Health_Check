@@ -338,139 +338,137 @@ def show_input_step1():
 
 # --- หน้าที่ 3: Input Step 2 (Business Mgmt) ---
 def show_input_step2():
-    scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
-    
-    # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
+    scroll_to_top() 
+
+    # 1. ฝัง CSS
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
-        
-        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
+        html, body, [class*="css"], h1, h2, h3, h4, h5, h6, p, span, div, label, button, input, select {
             font-family: 'Sarabun', sans-serif !important;
         }
-        
-        /* ปรับแต่งปุ่มกดให้เหมือนหน้าที่แล้ว (ถ้าต้องการ) */
-        button[kind="primary"] {
-             background-color: white !important;
-             color: #333 !important;
-             border: 2px solid #A9A9A9 !important;
-        }
-        button[kind="primary"]:hover {
-             background-color: #FF5C8D !important;
-             border-color: #A9A9A9 !important;
-             color: white !important;
+        .stButton>button {
+            background-color: #FE5C8D !important;
+            color: white !important;
+            border: 1px solid #ddd !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="step-indicator">ขั้นตอนที่ 2/2: ระดับดำเนินงาน</div>', unsafe_allow_html=True)
-    
-    # แก้ไข 1: หัวข้อหลักเป็นสีน้ำเงิน (#1E3A8A)
-    st.markdown("<h3 style='font-family: Sarabun, sans-serif; font-weight: 600; color: #1E3A8A;'>💼 ระดับดำเนินงาน</h3>", unsafe_allow_html=True)
-    
-    st.info(
-        "💡 **กรุณาประเมินระดับการดำเนินงาน**\n\n"
-        "**0** = ไม่มี &nbsp;&nbsp;•&nbsp;&nbsp; "
-        "**1** = น้อยที่สุด &nbsp;&nbsp;•&nbsp;&nbsp; "
-        "**5** = มากที่สุด"
-    )
+    st.markdown('<p style="color: #888; font-size: 1.1em; margin-bottom: 0;">ขั้นตอนที่ 2/2: ระดับดำเนินงาน</p>', unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1E3A8A; margin-top: 0;'>💼 ระดับดำเนินงาน</h3>", unsafe_allow_html=True)
 
-    # --- กำหนดตัวเลือกสำหรับ Dropdown ---
-    score_options = [0, 1, 2, 3, 4, 5]
+    st.info("💡 **กรุณาประเมินระดับการดำเนินงาน**\n\n**0** = ไม่มี   •   **1** = น้อยที่สุด   •   **5** = มากที่สุด")
+
+    score_options = [1-5]
     binary_options = ["ไม่มี (0)", "มี (1)"]
 
     with st.form("form_step2"):
-        # --- แบ่งเป็น 3 คอลัมน์ ---
         col1, col2, col3 = st.columns(3)
-        
         with col1:
-            # แก้ไข 2: หัวข้อย่อยเป็นสีน้ำเงิน
-            st.markdown("<h5 style='color: #1E3A8A; font-weight: bold;'>ผู้ประกอบการและทีมงาน</h5>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>ผู้ประกอบการและทีมงาน</p>", unsafe_allow_html=True)
             cap_netw = st.selectbox("ท่านใช้เครือข่ายหรือพันธมิตรในการดำเนินธุรกิจในระดับใด", score_options, index=0)
-            # ใช้ Dropdown แบบ มี/ไม่มี
             csr3 = st.selectbox("กิจการของท่านมีระบบกำจัดของเสีย", binary_options, index=0)
             ohr_career = st.selectbox("กิจการของท่านมีเส้นทางอาชีพให้พนักงานรับรู้", binary_options, index=0)
-            
+        
         with col2:
-            # แก้ไข 3: หัวข้อย่อยเป็นสีน้ำเงิน
-            st.markdown("<h5 style='color: #1E3A8A; font-weight: bold;'>การบัญชีและสถานการณ์เศรษฐกิจ</h5>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>การบัญชีและสถานการณ์เศรษฐกิจ</p>", unsafe_allow_html=True)
             prc_cfw = st.selectbox("กระแสเงินสดเพื่อประกอบธุรกิจและชำระหนี้อยู่ในระดับใด", score_options, index=0)
-            eco_adt = st.selectbox("กิจการของท่านสามารถในการปรับตัวรับสถานการณ์เศรษฐกิจในระดับใด", score_options, index=0)            
-
-        with col3:                  
-            # แก้ไข 4: หัวข้อย่อยเป็นสีน้ำเงิน
-            st.markdown("<h5 style='color: #1E3A8A; font-weight: bold;'>เทคโนโลยีและการสื่อสาร</h5>", unsafe_allow_html=True)
+            eco_adt = st.selectbox("กิจการของท่านสามารถในการปรับตัวรับสถานการณ์เศรษฐกิจในระดับใด", score_options, index=0)
+        
+        with col3:
+            st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>เทคโนโลยีและการสื่อสาร</p>", unsafe_allow_html=True)
             ecm_net = st.selectbox("การเข้าถึงเครือข่ายอินเตอร์เน็ตของกิจการอยู่ในระดับใด", score_options, index=0)
             res_ch = st.selectbox("ความสามารถในการโต้ตอบลูกค้าผ่านช่องทางต่าง ๆ อยู่ในระดับใด", score_options, index=0)
 
         st.markdown("---")
-
-        # --- ส่วนปุ่มกด (แก้ไข: ลบปุ่มย้อนกลับออก) ---
-        # แสดงปุ่มประเมินผลลัพธ์แบบเต็มความกว้าง
         submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
-            
+
         if submitted:
-            # แปลงค่า
             csr3_val = 1 if "มี" in csr3 else 0
             ohr_career_val = 1 if "มี" in ohr_career else 0
-
-            # บันทึกค่าลง Session
+            
             st.session_state.inputs.update({
                 'CAP_NETW': cap_netw, 'CSR3': csr3_val, 'OHR_CAREER': ohr_career_val,
                 'PRC_CFW': prc_cfw, 'ECO_ADT': eco_adt,
                 'ECM_NET': ecm_net, 'RES_CH': res_ch,
             })
             
-            # ✅ เรียกใช้งาน AI ประมวลผล (ต้องมีบรรทัดนี้)
+            # เรียกใช้งานฟังก์ชันประมวลผล
             process_results()
-            
-            # ไปหน้า Dashboard
-            navigate_to('dashboard')
+            navigate_to('dashboard') 
+
+# --- ฟังก์ชันประมวลผล (Processing Logic) ---
+def process_results():
+    # 0. ตั้งค่า Default เริ่มต้นเพื่อป้องกัน NameError ทุกกรณี
+    prob = 0.5
+    cluster_id = 0
+    inputs = st.session_state.inputs
+
+    # 1. Clustering Logic (DNA ธุรกิจ)
+    cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
+    cluster_vals = [inputs.get(f, 0) for f in cluster_features]
+    
+    try:
+        X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
+        X_scaled = scaler_model.transform(X_cluster)
+        raw_cluster_id = kmeans_model.predict(X_scaled)
+        
+        # การดึงตัวเลขออกจาก Array อย่างปลอดภัย
+        try:
+            cluster_id = int(raw_cluster_id)
+        except:
+            cluster_id = int(raw_cluster_id)
+    except Exception as e:
+        print(f"Cluster Error: {e}")
+        cluster_id = 0
+        
+    st.session_state.results['cluster_id'] = cluster_id
 
     # 2. Prediction Logic (AutoGluon)
     if predictor_model is not None and not df_raw.empty:
-        # สร้าง Row ข้อมูลใหม่จากแถวแรก และรีเซ็ต Index ให้เป็น 0
-        pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
-
-        # แทนค่าเฉลี่ย/ฐานนิยมในคอลัมน์ที่ไม่ได้ถาม
-        for c in df_raw.columns:
-            if c not in inputs.keys() and c not in ['ID', 'target']:
-                if str(df_raw[c].dtype) == 'object':
-                    mode_series = df_raw[c].mode()
-                    if not mode_series.empty:
-                        # ✅ แก้ไข: ดึงเฉพาะค่าแรก (iloc) เพื่อให้เป็นค่าเดี่ยว (Scalar) ป้องกัน Error
-                        pred_df.at[0, c] = mode_series.iloc
-                else:
-                    # ค่าเฉลี่ยเป็นค่าเดี่ยวอยู่แล้ว
-                    pred_df.at[0, c] = df_raw[c].mean()
-
-        # ใส่ค่าที่รับมาจาก User
-        for key, val in inputs.items():
-            if key in pred_df.columns:
-                pred_df.at[0, key] = val
-
-        # เพิ่ม SIZ และ YER (สมมติค่า Default)
-        pred_df.at[0, 'SIZ'] = 1 # Default Small
-        pred_df.at[0, 'YER'] = 10 # Default Established
-
-        # Predict Class 1 Probability
         try:
-            # รับค่าผลลัพธ์เป็นตาราง
-            prob_df = predictor_model.predict_proba(pred_df)
+            # 2.1 สร้างตาราง 1 แถวโดยจำลองโครงสร้างจาก df_raw (รักษารูปแบบ Data Type เดิมเป๊ะ)
+            pred_df = df_raw.iloc[].copy().reset_index(drop=True)
+            
+            # 2.2 เคลียร์ข้อมูลแถวแรกเป็นค่าว่างทั้งหมด เพื่อให้ AutoGluon จัดการ Imputation เอง 100%
+            for col in pred_df.columns:
+                pred_df.at[0, col] = float('nan')
+            
+            # 2.3 ใส่ค่าที่รับมาจาก User ลงในช่องที่ตรงกัน
+            for key, val in inputs.items():
+                if key in pred_df.columns:
+                    pred_df.at[0, key] = float(val) if isinstance(val, (int, float)) else val
+
+            # 2.4 ใส่ค่าตัวแปรพื้นฐานตามงานวิจัย
+            if 'SIZ' in pred_df.columns:
+                pred_df.at[0, 'SIZ'] = 1 
+            if 'YER' in pred_df.columns:
+                pred_df.at[0, 'YER'] = 10 
                 
-            # ✅ แก้ไข: ดึงค่าเดี่ยว (Scalar) อย่างปลอดภัยด้วย iloc เสมอ
+            # 2.5 สั่งพยากรณ์ผลลัพธ์
+            prob_df = predictor_model.predict_proba(pred_df)
+            
+            # 2.6 ดึงค่าคะแนนความน่าจะเป็นของ Class 1 อย่างปลอดภัยสูงสุด
             if 1 in prob_df.columns:
                 prob = float(prob_df[1].iloc)
             elif '1' in prob_df.columns:
                 prob = float(prob_df['1'].iloc)
             else:
-                # กรณีไม่มีชื่อคอลัมน์ ให้ดึงแถวแรก (0) และคอลัมน์ที่สอง (1)
                 prob = float(prob_df.iloc[1])
-
+                
         except Exception as e:
-            # โชว์ Error บนหน้าจอ หากมีปัญหาอื่นซ่อนอยู่
-            st.error(f"🚨 ข้อผิดพลาดจากการพยากรณ์: {e}")
-            prob = 0.5 # Fallback
+            # หากมี Error จริง ๆ จะถูกจับไว้ตรงนี้ ไม่ทำให้แอปพัง (No NameError)
+            st.error(f"🚨 ข้อผิดพลาดจากระบบพยากรณ์: {e}")
+            prob = 0.5 
+    else:
+        # กรณีไม่มีโมเดล
+        score = inputs.get('PRC_CFW', 0) * 0.4 + inputs.get('CAP_NETW', 0) * 0.3 + inputs.get('BEH_MON', 0) * 0.3
+        prob = 1 - (score / 5.0)
+
+    # 3. บันทึกผลลัพธ์ลงระบบ
+    st.session_state.results['risk_prob'] = prob
+    st.session_state.results['risk_score'] = float(prob) * 100
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับแก้ไข Syntax Error (วงเล็บครบ) ---
 def show_dashboard():
