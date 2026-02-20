@@ -469,7 +469,8 @@ def process_results():
         
         # Predict Class 1 Probability
         try:
-            prob = predictor_model.predict_proba(pred_df).iloc[1]
+            # ดึงค่าความน่าจะเป็นของ Class 1 (มีข้อจำกัด) จากแถวแรก (iloc)
+            prob = predictor_model.predict_proba(pred_df)[1].iloc
         except:
             prob = 0.5 # Fallback
     else:
