@@ -683,7 +683,7 @@ def show_recommendation():
     
     st.markdown(f"""
         <div style='background-color: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;'>
-        <p style='color: #1E3A8A; font-size: 1.1em; margin-bottom: 5px;'><b>💼 คำแนะนำด้านการเงิน (จากความน่าจะเป็น {risk_score:.1f}%)</b></p>
+        <p style='color: #1E3A8A; font-size: 1.1em; margin-bottom: 5px;'><b>💼 คำแนะนำด้านการเงิน (จากข้อจำกัดการเข้าถึงแหล่งเงินทุน {risk_score:.1f}%)</b></p>
         <p>{urgent_advice}</p>
         </div>
     """, unsafe_allow_html=True)
