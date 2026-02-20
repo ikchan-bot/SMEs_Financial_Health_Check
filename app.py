@@ -615,55 +615,50 @@ def show_dashboard():
         if st.button("📄 ดูข้อเสนอแนะโดยละเอียด (Recommendation)", type="primary", use_container_width=True):
             navigate_to('recommendation')
 
-# --- หน้าที่ 5: Recommendations (ปรับแต่งขนาดตัวอักษรและไอคอน) ---
+# --- หน้าที่ 5: Recommendations (ปรับแต่งขนาดตัวอักษรและไอคอน + ผสาน AI 2 ตัว) ---
 def show_recommendation():
     scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
+
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู)
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
-        
-        html, body, [class*="css"], h1, h2, h3, h4, h5, button, input, select, label, div {
+        html, body, [class*="css"], h1, h2, h3, button, input, select, label, div {
             font-family: 'Sarabun', sans-serif !important;
-        }
-
-        /* --- ปรับแต่งปุ่มกด (Next Button) --- */
-        div[data-testid="stBaseButton-primary"] > button,
-        button[kind="primary"] {
-            background-color: white !important;
-            color: #333 !important;                 
-            border: 2px solid #A9A9A9 !important;   
-            border-radius: 8px !important;
-            transition: all 0.3s ease !important;
-        }
-
-        div[data-testid="stBaseButton-primary"] > button:hover,
-        button[kind="primary"]:hover {
-            background-color: #FF5C8D !important;   /* สีชมพู Chula */
-            border-color: #A9A9A9 !important;       /* กรอบสีเทาเหมือนเดิม */
-            color: white !important;                
-            box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
-            transform: scale(1.02) !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
     # 2. หัวข้อหลัก (สีน้ำเงิน #1E3A8A)
-    st.markdown("<h3 style='color:#1E3A8A; font-weight:bold;'>🎯 คำแนะนำสำหรับท่าน (Recommendations)</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1E3A8A;'>🎯 คำแนะนำสำหรับท่าน (Recommendations)</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # ดึงค่า cluster_id
+    # ดึงค่าผลลัพธ์จาก AI ทั้ง 2 ตัว
     if 'results' not in st.session_state:
-        st.session_state.results = {'cluster_id': 0}
+        st.session_state.results = {'cluster_id': 0, 'risk_score': 50.0}
+    
     cluster_id = st.session_state.results.get('cluster_id', 0)
+    risk_score = st.session_state.results.get('risk_score', 50.0)
 
-    # ✅ เพิ่มส่วนนี้: แปลงค่า cluster_id จาก Array ให้เป็นตัวเลข Integer ธรรมดา
+    # ✅ แก้ Error: แปลง cluster_id จาก Array ให้เป็นตัวเลข Integer ธรรมดา
     if isinstance(cluster_id, (np.ndarray, list)):
         cluster_id = int(cluster_id)
     else:
         cluster_id = int(cluster_id)
-    
-    # Recommendation Logic
+
+    # ---------------------------------------------------------
+    # ส่วนที่ 1: คำแนะนำด้านการเงิน ยึดตามความเสี่ยง AutoGluon (Risk Score)
+    # ---------------------------------------------------------
+    if risk_score > 70:
+        urgent_advice = "ควรเร่งสร้างวินัยทางการเงิน จัดทำบัญชีรายรับ-รายจ่ายให้ชัดเจน และลดภาระหนี้ที่ไม่จำเป็นด่วน ธนาคารพิจารณา 'กระแสเงินสด' เป็นหลักในการให้สินเชื่อ"
+    elif risk_score >= 41:
+        urgent_advice = "กระแสเงินสดของท่านยังพอประคองตัวได้ แต่ควรระวังการลงทุนเกินตัว และเริ่มจัดเตรียมเอกสารทางการเงินให้เป็นระบบเพื่อเตรียมความพร้อมรับความเสี่ยง"
+    else:
+        urgent_advice = "กิจการมีกระแสเงินสดและเครือข่ายธุรกิจที่ดี เครดิตอยู่ในเกณฑ์ยอดเยี่ยม สามารถเตรียมแผนธุรกิจเพื่อยื่นขอสินเชื่อขยายกิจการได้เลย"
+
+    # ---------------------------------------------------------
+    # ส่วนที่ 2: คำแนะนำด้านการจัดการ ยึดตาม DNA ธุรกิจ (K-Means)
+    # ---------------------------------------------------------
     recs = {
         0: { # Active Marketer
             "strength": "กิจการของท่านมีความเข้มแข็งด้านการตลาด การสร้างแบรนด์และภาพลักษณ์องค์กร",
@@ -681,43 +676,35 @@ def show_recommendation():
             "maintain": "รักษามาตรฐานระบบการจัดการ ส่งเสริมการตลาดและผลิตภัณฑ์ และเทคโนโลยีให้ทันสมัยอยู่เสมอ"
         }
     }
+
+    rec = recs.get(cluster_id, recs)
+
+    # --- แสดงผลหน้าจอ (ปรับตาม Format สีสันสวยงามที่ท่านออกแบบไว้) ---
     
-    rec = recs.get(cluster_id, recs[0])
-    
-    # --- แสดงผลแบบ HTML เพื่อปรับขนาดตัวอักษรและไอคอน ---
-    
-    # 1. จุดแข็ง (สีเขียว)
     st.markdown(f"""
-        <div style="background-color: #d1e7dd; padding: 15px; border-radius: 8px; border: 1px solid #badbcc; margin-bottom: 15px;">
-            <h4 style="color: #0f5132; margin: 0; font-family: Sarabun; font-weight: bold;">✅ จุดแข็งที่ควรรักษา:</h4>
-            <div style="color: #0f5132; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
-                {rec['strength']}
-            </div>
+        <div style='background-color: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;'>
+        <p style='color: #1E3A8A; font-size: 1.1em; margin-bottom: 5px;'><b>💼 คำแนะนำด้านการเงิน (จากความน่าจะเป็น {risk_score:.1f}%)</b></p>
+        <p>{urgent_advice}</p>
         </div>
     """, unsafe_allow_html=True)
 
-    # 2. สิ่งที่ต้องทำด่วน (สีแดง)
     st.markdown(f"""
-        <div style="background-color: #f8d7da; padding: 15px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 15px;">
-            <h4 style="color: #842029; margin: 0; font-family: Sarabun; font-weight: bold;">⚠️ สิ่งที่ต้องทำด่วน:</h4>
-            <div style="color: #842029; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
-                {rec['urgent']}
-            </div>
-        </div>
+        <p style='color: #2ecc71; font-size: 1.1em; margin-top: 15px;'><b>✅ จุดแข็งที่ควรรักษา:</b></p>
+        <p>{rec['strength']}</p>
     """, unsafe_allow_html=True)
 
-    # 3. ข้อแนะนำเพิ่มเติม (สีฟ้า)
     st.markdown(f"""
-        <div style="background-color: #cff4fc; padding: 15px; border-radius: 8px; border: 1px solid #b6effb; margin-bottom: 15px;">
-            <h4 style="color: #055160; margin: 0; font-family: Sarabun; font-weight: bold;">🛡️ ข้อแนะนำเพิ่มเติม:</h4>
-            <div style="color: #055160; margin-top: 8px; font-size: 1.1rem; font-family: Sarabun;">
-                {rec['maintain']}
-            </div>
-        </div>
+        <p style='color: #e74c3c; font-size: 1.1em; margin-top: 15px;'><b>⚠️ สิ่งที่ต้องปรับปรุงระบบหลังบ้าน:</b></p>
+        <p>{rec['urgent']}</p>
     """, unsafe_allow_html=True)
-    
+
+    st.markdown(f"""
+        <p style='color: #3498db; font-size: 1.1em; margin-top: 15px;'><b>🛡️ ข้อแนะนำเพิ่มเติม:</b></p>
+        <p>{rec['maintain']}</p>
+    """, unsafe_allow_html=True)
+
     st.markdown("---")
-    
+
     # ปุ่มกดไปหน้า Profile
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
