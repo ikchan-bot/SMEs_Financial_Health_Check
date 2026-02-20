@@ -271,7 +271,8 @@ def show_landing():
         
 # --- หน้าที่ 2: Input Step 1 (DNA) ---
 def show_input_step1():
-    scroll_to_top() # <--- ใส่ไว้บรรทัดแรก 
+    scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
+    
     # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
     st.markdown("""
         <style>
@@ -337,7 +338,8 @@ def show_input_step1():
 
 # --- หน้าที่ 3: Input Step 2 (Business Mgmt) ---
 def show_input_step2():
-    scroll_to_top() # <--- ใส่ไว้บรรทัดแรก   
+    scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
+    
     # 1. ฝัง CSS (Sarabun + สีหัวข้อ)
     st.markdown("""
         <style>
@@ -419,8 +421,11 @@ def show_input_step2():
                 'ECM_NET': ecm_net, 'RES_CH': res_ch,
             })
             
+            # ✅ เรียกใช้งาน AI ประมวลผล (ต้องมีบรรทัดนี้)
+            process_results()
+            
             # ไปหน้า Dashboard
-            navigate_to('dashboard') # ไปหน้าแสดงผล
+            navigate_to('dashboard')
 
 # --- ฟังก์ชันประมวลผล (Processing Logic) ---
 def process_results():
@@ -473,10 +478,13 @@ def process_results():
         prob = 1 - (score / 5.0) # คะแนนเยอะ ความเสี่ยงน้อย
         
     st.session_state.results['risk_prob'] = prob
+    # ✅ แปลงความน่าจะเป็น (0.0 - 1.0) เป็นเปอร์เซ็นต์ (0 - 100) เพื่อส่งให้กราฟเข็มไมล์
+    st.session_state.results['risk_score'] = float(prob) * 100
 
 # --- หน้าที่ 4: Dashboard (Result) - ฉบับแก้ไข Syntax Error (วงเล็บครบ) ---
 def show_dashboard():
     scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
+    
     # 1. ฝัง CSS (เพิ่มส่วนตกแต่งปุ่มกด)
     st.markdown("""
         <style>
@@ -520,39 +528,14 @@ def show_dashboard():
     inputs = st.session_state.inputs
 
     # ==========================================
-    # 2. ส่วนประมวลผล (Calculation Logic)
+    # 2. ดึงผลลัพธ์จาก AI (แก้ไข: ลบสูตรเดิมทิ้งทั้งหมด)
     # ==========================================
+    cluster_id = st.session_state.results.get('cluster_id', 1)
+    risk_score = st.session_state.results.get('risk_score', 50.0)
     
-    # 2.1 คำนวณคะแนนรวม DNA (Total Score Calculation)
-    cluster_features = ['BEH_MON', 'BRN_IMAGE', 'BRN_BRAND', 'SAV_VIRUS', 'SAV_PDPA', 'CRI_PLN', 'POL_BEN', 'POL_ADJ']
-    
-    # รวมคะแนน (Score 0-40)
-    total_score = sum([inputs.get(f, 0) for f in cluster_features])
-    
-    # กำหนด Logic การแบ่งกลุ่มตามคะแนน (Thresholds)
-    if total_score <= 15:
-        cluster_id = 1  # Potential Starter (แดง)
-        # คำนวณ % ความเสี่ยงในช่วง 71-100%
-        risk_score = 100 - (total_score * (29/15)) 
-        risk_score = max(71, min(100, risk_score))
-        
-    elif total_score <= 29:
-        cluster_id = 0  # Active Marketer (เหลือง)
-        # คำนวณ % ความเสี่ยงในช่วง 41-70%
-        normalized_score = total_score - 16
-        risk_score = 70 - (normalized_score * (29/13))
-        risk_score = max(41, min(70, risk_score))
-        
-    else:
-        cluster_id = 2  # Master Leader (เขียว)
-        # คำนวณ % ความเสี่ยงในช่วง 0-40%
-        normalized_score = total_score - 30
-        risk_score = 40 - (normalized_score * (40/10))
-        risk_score = max(0, min(40, risk_score))
-
-    # บันทึกผลลัพธ์
-    st.session_state.results['cluster_id'] = cluster_id
-    st.session_state.results['risk_score'] = risk_score
+    # กรณี cluster_id คืนค่ามาเป็น Array จาก K-Means (เช่น ) ให้ดึงตัวเลขออกมา
+    if isinstance(cluster_id, (np.ndarray, list)):
+        cluster_id = int(cluster_id)
 
     # ==========================================
     # 3. ส่วนแสดงผล (Display)
