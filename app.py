@@ -454,33 +454,33 @@ def process_results():
         for c in df_raw.columns:
             if c not in inputs.keys() and c not in ['ID', 'target']:
                 if str(df_raw[c].dtype) == 'object':
-                    # ✅ แก้ไขจุดที่ 1: เติม  เพื่อดึงค่า mode ค่าเดียว
+                    # ✅ แก้ไขจุดที่ 1: เติม  เพื่อดึงค่า mode ค่าแรกค่าเดียว
                     if not df_raw[c].mode().empty:
-                        pred_df[c] = df_raw[c].mode() 
+                        pred_df.loc[0, c] = df_raw[c].mode()
                 else:
-                    pred_df[c] = df_raw[c].mean()
+                    pred_df.loc[0, c] = df_raw[c].mean()
 
         # ใส่ค่าที่รับมาจาก User
         for key, val in inputs.items():
             if key in pred_df.columns:
-                pred_df[key] = val
+                pred_df.loc[0, key] = val
 
         # เพิ่ม SIZ และ YER (สมมติค่า Default หรือถามเพิ่มได้ ถ้าจำเป็น)
-        pred_df['SIZ'] = 1 # Default Small
-        pred_df['YER'] = 10 # Default Established
+        pred_df.loc[0, 'SIZ'] = 1 # Default Small
+        pred_df.loc[0, 'YER'] = 10 # Default Established
 
         # Predict Class 1 Probability
         try:
             # รับค่าผลลัพธ์เป็นตาราง
             prob_df = predictor_model.predict_proba(pred_df)
                 
-            # ✅ แก้ไขจุดที่ 2: ระบุแถวแรก (Index 0) ให้ชัดเจน ป้องกัน Error
+            # ✅ แก้ไขจุดที่ 2: ระบุแถวแรก (Index 0) ให้ชัดเจน ป้องกัน Error Out of bounds
             if 1 in prob_df.columns:
                 prob = float(prob_df[1].iloc)
             elif '1' in prob_df.columns:
                 prob = float(prob_df['1'].iloc)
             else:
-                # กรณีไม่มีชื่อคอลัมน์ ให้ดึงคอลัมน์ที่ 2 (ตำแหน่ง 1) ของแถวแรก (ตำแหน่ง 0)
+                # กรณีไม่มีชื่อคอลัมน์ ให้ดึงแถวแรก (0) และคอลัมน์ที่สอง (1)
                 prob = float(prob_df.iloc[1])
 
         except Exception as e:
