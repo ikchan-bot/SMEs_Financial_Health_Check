@@ -655,8 +655,13 @@ def show_recommendation():
     # ดึงค่า cluster_id
     if 'results' not in st.session_state:
         st.session_state.results = {'cluster_id': 0}
-    
     cluster_id = st.session_state.results.get('cluster_id', 0)
+
+    # ✅ เพิ่มส่วนนี้: แปลงค่า cluster_id จาก Array ให้เป็นตัวเลข Integer ธรรมดา
+    if isinstance(cluster_id, (np.ndarray, list)):
+        cluster_id = int(cluster_id)
+    else:
+        cluster_id = int(cluster_id)
     
     # Recommendation Logic
     recs = {
