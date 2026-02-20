@@ -469,10 +469,21 @@ def process_results():
         
         # Predict Class 1 Probability
         try:
-            # ดึงค่าความน่าจะเป็นของ Class 1 (มีข้อจำกัด) จากแถวแรก (iloc)
-            prob = predictor_model.predict_proba(pred_df)[1].iloc
-        except:
+            # รับค่าผลลัพธ์เป็นตาราง
+            prob_df = predictor_model.predict_proba(pred_df)
+            
+            # ดึงเฉพาะความน่าจะเป็นของ Class 1 (มีข้อจำกัด) 
+            # ตรวจสอบว่าคอลัมน์ชื่อ 1 มีอยู่หรือไม่ ถ้ามีให้ดึงคอลัมน์ 1 แถวที่ 0
+            if 1 in prob_df.columns:
+                prob = float(prob_df[1].iloc)
+            else:
+                # ถ้าไม่มีชื่อคอลัมน์ ให้ดึงคอลัมน์ที่ 2 (ตำแหน่ง 1) แถวที่ 0
+                prob = float(prob_df.iloc[1])
+                
+        except Exception as e:
+            print(f"Prediction Error: {e}")
             prob = 0.5 # Fallback
+            
     else:
         # Logic จำลองกรณีไม่มีไฟล์โมเดล (สำหรับการแสดงผล Demo)
         score = inputs['PRC_CFW'] * 0.4 + inputs['CAP_NETW'] * 0.3 + inputs['BEH_MON'] * 0.3
