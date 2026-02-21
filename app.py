@@ -616,9 +616,9 @@ def show_dashboard():
 
         # 3. แปะข้อความ สูง/ปานกลาง/ต่ำ ลงไปตรงกลางเกจ
         fig.add_annotation(
-            x=0.5, y=0.20,  
+            x=0.5, y=0.30,  
             text=f"<b>{risk_level_text}</b>",
-            font=dict(size=40, color=text_color, family="Sarabun"),
+            font=dict(size=60, color=text_color, family="Sarabun"),
             showarrow=False
         )
         
