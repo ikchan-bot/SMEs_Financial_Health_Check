@@ -288,6 +288,7 @@ def show_input_step1():
     """, unsafe_allow_html=True)
     
     # หัวข้อหลัก
+    st.markdown("<h3 style='color: #1E3A8A;'>ขั้นตอนที่ 1/2: การประเมิน</h3>", unsafe_allow_html=True)
     st.markdown("<h3 style='font-family: Sarabun; font-weight: 600; color: #1E3A8A;'>🧬 DNA ธุรกิจของท่าน</h3>", unsafe_allow_html=True)
     
     st.info(
@@ -355,7 +356,7 @@ def show_input_step2():
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<p style="color: #888; font-size: 1.1em; margin-bottom: 0;">ขั้นตอนที่ 2/2: ระดับดำเนินงาน</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #888; font-size: 1.1em; margin-bottom: 0;">ขั้นตอนที่ 2/2: การประเมิน</p>', unsafe_allow_html=True)
     st.markdown("<h3 style='color: #1E3A8A; margin-top: 0;'>💼 ระดับดำเนินงาน</h3>", unsafe_allow_html=True)
 
     st.info("💡 **กรุณาประเมินระดับการดำเนินงาน**\n\n**0** = ไม่มี   •   **1** = น้อยที่สุด   •   **5** = มากที่สุด")
