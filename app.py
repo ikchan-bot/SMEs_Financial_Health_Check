@@ -360,8 +360,8 @@ def show_input_step2():
 
     st.info("💡 **กรุณาประเมินระดับการดำเนินงาน**\n\n**0** = ไม่มี   •   **1** = น้อยที่สุด   •   **5** = มากที่สุด")
 
-    # ✅ แก้ปัญหาข้อ 1: คืนค่าให้ Dropdown กลับมาเป็น 0-5
-    score_options = [1-5]
+    # ✅ ใช้คำสั่ง list(range(6)) เพื่อสร้างเลข 0 ถึง 5 อัตโนมัติ (แก้ปัญหาระบบแชทกลืนตัวเลข)
+    score_options = list(range(6))
     binary_options = ["ไม่มี (0)", "มี (1)"]
 
     with st.form("form_step2"):
@@ -413,11 +413,7 @@ def process_results():
         X_cluster = pd.DataFrame([cluster_vals], columns=cluster_features)
         X_scaled = scaler_model.transform(X_cluster)
         raw_cluster_id = kmeans_model.predict(X_scaled)
-        
-        if isinstance(raw_cluster_id, (np.ndarray, list)):
-            cluster_id = int(raw_cluster_id)
-        else:
-            cluster_id = int(raw_cluster_id)
+        cluster_id = int(np.ravel(raw_cluster_id).item())
     except Exception as e:
         print(f"Cluster Error: {e}")
         cluster_id = 0
@@ -427,7 +423,7 @@ def process_results():
     # 2. Prediction Logic (AutoGluon)
     if predictor_model is not None and not df_raw.empty:
         try:
-            pred_df = df_raw.iloc[0:1].copy().reset_index(drop=True)
+            pred_df = df_raw.head(1).copy().reset_index(drop=True)
             
             for col in pred_df.columns:
                 pred_df.at[0, col] = float('nan')
@@ -441,13 +437,9 @@ def process_results():
                 
             prob_df = predictor_model.predict_proba(pred_df)
             
-            # ✅ แก้ปัญหาข้อ 2: เติม  เพื่อดึงตัวเลขออกมาจาก iLocIndexer
-            if 1 in prob_df.columns:
-                prob = float(prob_df[1].iloc)
-            elif '1' in prob_df.columns:
-                prob = float(prob_df['1'].iloc)
-            else:
-                prob = float(prob_df.iloc[1])
+            # ✅ แก้ปัญหา _iLocIndexer ด้วยการดึงค่าผ่าน numpy array (flatten) รับรองไม่พัง
+            prob_array = prob_df.values.flatten()
+            prob = float(prob_array[-1]) # ดึงค่าความน่าจะเป็นตัวสุดท้าย (Class 1) เสมอ
                 
         except Exception as e:
             st.error(f"🚨 ข้อผิดพลาดจากระบบพยากรณ์: {e}")
