@@ -719,28 +719,45 @@ def show_recommendation():
 
     # --- แสดงผลหน้าจอ (ปรับตาม Format สีสันสวยงามที่ท่านออกแบบไว้) ---
     
+    # 1. กล่องผลลัพธ์ (พื้นหลังสีเทาอ่อน #F2F2F2)
     st.markdown(f"""
-        <div style='background-color: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;'>
+        <div style='background-color: #F2F2F2; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 25px;'>
         <p style='color: #1E3A8A; font-size: 1.1em; margin-bottom: 5px;'><b>💼 ผลลัพธ์ (จากข้อจำกัดการเข้าถึงแหล่งเงินทุน {risk_score:.1f}%)</b></p>
-        <p>{urgent_advice}</p>
+        <p style='margin-bottom: 0;'>{urgent_advice}</p>
         </div>
     """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-        <p style='color: #2ecc71; font-size: 1.1em; margin-top: 15px;'><b>✅ จุดเด่น:</b></p>
-        <p>{rec['strength']}</p>
-    """, unsafe_allow_html=True)
+    # 2. แบ่ง 3 คอลัมน์ สำหรับ จุดเด่น, อัปเกรดด่วน, รักษาไว้
+    col_rec1, col_rec2, col_rec3 = st.columns(3)
 
-    st.markdown(f"""
-        <p style='color: #e74c3c; font-size: 1.1em; margin-top: 15px;'><b>🚀 อัปเกรดด่วน:</b></p>
-        <p>{rec['urgent']}</p>
-    """, unsafe_allow_html=True)
+    # คอลัมน์ 1: จุดเด่น (พื้นหลังสีเขียวอ่อน #E2EFD9)
+    with col_rec1:
+        st.markdown(f"""
+            <div style='background-color: #E2EFD9; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
+            <p style='color: #2e7d32; font-size: 1.1em; margin-bottom: 10px;'><b>✅ จุดเด่น:</b></p>
+            <p style='font-size: 0.95em; line-height: 1.5;'>{rec['strength']}</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-        <p style='color: #3498db; font-size: 1.1em; margin-top: 15px;'><b>🛡️ รักษาไว้:</b></p>
-        <p>{rec['maintain']}</p>
-    """, unsafe_allow_html=True)
+    # คอลัมน์ 2: อัปเกรดด่วน (พื้นหลังสีเหลือง/ส้มอ่อน #FFF2CC)
+    with col_rec2:
+        st.markdown(f"""
+            <div style='background-color: #FFF2CC; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
+            <p style='color: #c62828; font-size: 1.1em; margin-bottom: 10px;'><b>🚀 อัปเกรดด่วน:</b></p>
+            <p style='font-size: 0.95em; line-height: 1.5;'>{rec['urgent']}</p>
+            </div>
+        """, unsafe_allow_html=True)
 
+    # คอลัมน์ 3: รักษาไว้ (พื้นหลังสีฟ้าอ่อน #DEEAF6)
+    with col_rec3:
+        st.markdown(f"""
+            <div style='background-color: #DEEAF6; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
+            <p style='color: #1565c0; font-size: 1.1em; margin-bottom: 10px;'><b>🛡️ รักษาไว้:</b></p>
+            <p style='font-size: 0.95em; line-height: 1.5;'>{rec['maintain']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True) # เพิ่มช่องว่างด้านล่างเล็กน้อยให้อ่านสบายตา
     st.markdown("---")
 
     # ปุ่มกดไปหน้า Profile
