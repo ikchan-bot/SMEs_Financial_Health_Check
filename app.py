@@ -816,11 +816,13 @@ def show_profile():
         
         st.write("") # เว้นบรรทัด
         
-        # --- ข้อความสีชมพูจุฬาฯ ก่อนปุ่มยืนยัน ---
-        st.markdown("<p style='color:#FF5C8D; font-weight:bold;'>โปรดกดยืนยันเพื่อตอบแบบสอบถามในลำดับถัดไปครับ</p>", unsafe_allow_html=True)
+        # --- ข้อความสีชมพูจุฬาฯ ก่อนปุ่มยืนยัน (จัดกึ่งกลาง) ---
+        st.markdown("<p style='color:#FF5C8D; font-weight:bold; text-align:center;'>โปรดกดยืนยันเพื่อตอบแบบสอบถามในลำดับถัดไปครับ</p>", unsafe_allow_html=True)
         
-        # ปุ่มยืนยัน (CSS จะทำให้ Hover เป็นสีชมพู)
-        submitted = st.form_submit_button("ยืนยัน", type="primary", use_container_width=True)
+        # สร้างคอลัมน์เพื่อบีบขนาดปุ่มให้อยู่ตรงกลาง (สัดส่วน 1 : 2 : 1)
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+        with col_btn2:
+            submitted = st.form_submit_button("ยืนยัน", type="primary", use_container_width=True)
         
     if submitted:
         st.balloons() # ลูกโป่งลอย
