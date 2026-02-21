@@ -753,7 +753,7 @@ def show_recommendation():
 def show_profile():
     scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
     
-    # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู + ปุ่ม Link)
+    # 1. ฝัง CSS (Sarabun + ปุ่มกด/ปุ่มลิงก์ Hover ชมพูจุฬาฯ)
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
@@ -762,7 +762,7 @@ def show_profile():
             font-family: 'Sarabun', sans-serif !important;
         }
 
-        /* --- ปรับแต่งปุ่มกดแบบ Primary (ปุ่ม "ยืนยัน" ใน Form) --- */
+        /* --- 1. ปรับแต่งปุ่มกดแบบ Primary (ปุ่ม "ยืนยัน" ใน Form) --- */
         div[data-testid="stFormSubmitButton"] > button,
         button[kind="primary"] {
             background-color: white !important;
@@ -781,24 +781,19 @@ def show_profile():
             transform: scale(1.02) !important;
         }
 
-        /* --- ปรับแต่งปุ่มลิงก์ (Link Button ไป MS Forms) --- */
-        a[data-testid="stLinkButton"] {
+        /* --- 2. ปรับแต่งปุ่มลิงก์ (Link Button ทำแบบสอบถาม) --- */
+        div[data-testid="stLinkButton"] > a {
             background-color: white !important;
             color: #333 !important;
             border: 2px solid #A9A9A9 !important;
             border-radius: 8px !important;
-            text-align: center !important;
-            text-decoration: none !important;
             transition: all 0.3s ease !important;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
+            text-decoration: none !important;
         }
-        
         /* Link Button Hover: สีชมพูจุฬา ตัวอักษรขาว */
-        a[data-testid="stLinkButton"]:hover {
+        div[data-testid="stLinkButton"] > a:hover {
             background-color: #FF5C8D !important;
-            border-color: #A9A9A9 !important;
+            border-color: #FF5C8D !important;
             color: white !important;
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
             transform: scale(1.02) !important;
