@@ -566,9 +566,9 @@ def show_dashboard():
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [0, 40], 'color': "#2ecc71"},   # เขียว (0-40) Master
-                    {'range': [40, 70], 'color': "#F9D607"},  # เหลือง (40-70) Active
-                    {'range': [70, 100], 'color': "#e74c3c"}  # แดง (70-100) Potential
+                    {'range': [0, 35], 'color': "#2ecc71"},   # เขียว (0-40) Master
+                    {'range': [35, 45], 'color': "#F9D607"},  # เหลือง (40-70) Active
+                    {'range': [45, 100], 'color': "#e74c3c"}  # แดง (70-100) Potential
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
