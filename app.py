@@ -727,17 +727,17 @@ def show_recommendation():
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
-        <p style='color: #2ecc71; font-size: 1.1em; margin-top: 15px;'><b>✅ จุดแข็งที่ควรรักษา:</b></p>
+        <p style='color: #2ecc71; font-size: 1.1em; margin-top: 15px;'><b>✅ จุดเด่น:</b></p>
         <p>{rec['strength']}</p>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
-        <p style='color: #e74c3c; font-size: 1.1em; margin-top: 15px;'><b>⚠️ สิ่งที่ต้องปรับปรุง:</b></p>
+        <p style='color: #e74c3c; font-size: 1.1em; margin-top: 15px;'><b>🚀 อัปเกรดด่วน:</b></p>
         <p>{rec['urgent']}</p>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
-        <p style='color: #3498db; font-size: 1.1em; margin-top: 15px;'><b>🛡️ ข้อแนะนำเพิ่มเติม:</b></p>
+        <p style='color: #3498db; font-size: 1.1em; margin-top: 15px;'><b>🛡️ รักษาไว้:</b></p>
         <p>{rec['maintain']}</p>
     """, unsafe_allow_html=True)
 
