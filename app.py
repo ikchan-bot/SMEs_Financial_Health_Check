@@ -752,6 +752,7 @@ def show_recommendation():
 # --- หน้าที่ 6: Profile & Survey (TAM) - ฉบับแก้ไขข้อความและปุ่ม ---
 def show_profile():
     scroll_to_top() # <--- ใส่ไว้บรรทัดแรก
+    
     # 1. ฝัง CSS (Sarabun + ปุ่ม Hover ชมพู + ปุ่ม Link)
     st.markdown("""
         <style>
@@ -761,8 +762,9 @@ def show_profile():
             font-family: 'Sarabun', sans-serif !important;
         }
 
-        /* --- ปรับแต่งปุ่มกดทั่วไป (ปุ่ม "ยืนยัน" ใน Form) --- */
-        div[data-testid="stForm"] button[kind="secondary"] {
+        /* --- ปรับแต่งปุ่มกดแบบ Primary (ปุ่ม "ยืนยัน" ใน Form) --- */
+        div[data-testid="stFormSubmitButton"] > button,
+        button[kind="primary"] {
             background-color: white !important;
             color: #333 !important;                 
             border: 2px solid #A9A9A9 !important;   
@@ -770,9 +772,10 @@ def show_profile():
             transition: all 0.3s ease !important;
         }
         /* Hover: สีชมพูจุฬา ตัวอักษรขาว */
-        div[data-testid="stForm"] button[kind="secondary"]:hover {
-            background-color: #FF5C8D !important;   
-            border-color: #A9A9A9 !important;
+        div[data-testid="stFormSubmitButton"] > button:hover,
+        button[kind="primary"]:hover {
+            background-color: #FF5C8D !important;
+            border-color: #FF5C8D !important;
             color: white !important;                
             box-shadow: 0 4px 10px rgba(255, 92, 141, 0.4) !important;
             transform: scale(1.02) !important;
@@ -817,7 +820,7 @@ def show_profile():
         st.markdown("<p style='color:#FF5C8D; font-weight:bold;'>โปรดกดยืนยันเพื่อตอบแบบสอบถามในลำดับถัดไปครับ</p>", unsafe_allow_html=True)
         
         # ปุ่มยืนยัน (CSS จะทำให้ Hover เป็นสีชมพู)
-        submitted = st.form_submit_button("ยืนยัน")
+        submitted = st.form_submit_button("ยืนยัน", type="primary", use_container_width=True)
         
     if submitted:
         st.balloons() # ลูกโป่งลอย
