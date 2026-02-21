@@ -576,20 +576,35 @@ def show_dashboard():
     with col2:
         st.markdown(f"### 🔮 มีข้อจำกัดการเข้าถึงแหล่งเงินทุน: **{risk_score:.1f}%**", unsafe_allow_html=True)
         
-        # กราฟ Gauge Chart
+# ==========================================
+        # 🌟 โค้ดกราฟ Gauge Chart (แสดงข้อความ สูง/ปานกลาง/ต่ำ)
+        # ==========================================
+        
+        # 1. กำหนดเงื่อนไขคำที่จะแสดงตรงกลางกราฟ ตามช่วงคะแนน
+        if risk_score < 40:
+            risk_level_text = "ต่ำ"
+            text_color = "#1b5e20"  # เขียวเข้ม
+        elif risk_score <= 70:
+            risk_level_text = "ปานกลาง"
+            text_color = "#b8860b"  # เหลืองทอง
+        else:
+            risk_level_text = "สูง"
+            text_color = "#842029"  # แดงเข้ม
+
+        # 2. สร้างกราฟ Gauge (ซ่อนตัวเลขตรงกลาง)
         fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
+            mode = "gauge",  
             value = risk_score,
             gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray"},
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "gray", 'tickvals': [0, 40, 70, 100]},
                 'bar': {'color': "darkblue"},
                 'bgcolor': "white",
                 'borderwidth': 2,
                 'bordercolor': "gray",
                 'steps': [
-                    {'range': [0, 40], 'color': "#2ecc71"},   # เขียว (0-40) Master
-                    {'range': [40, 70], 'color': "#F9D607"},  # เหลือง (40-70) Active
-                    {'range': [70, 100], 'color': "#e74c3c"}  # แดง (70-100) Potential
+                    {'range': [0, 40], 'color': "#2ecc71"},   # เขียว 
+                    {'range': [40, 70], 'color': "#F9D607"},  # เหลือง 
+                    {'range': [70, 100], 'color': "#e74c3c"}  # แดง 
                 ],
                 'threshold': {
                     'line': {'color': "black", 'width': 4},
@@ -598,6 +613,14 @@ def show_dashboard():
                 }
             }
         ))
+
+        # 3. แปะข้อความ สูง/ปานกลาง/ต่ำ ลงไปตรงกลางเกจ
+        fig.add_annotation(
+            x=0.5, y=0.25,  
+            text=f"<b>{risk_level_text}</b>",
+            font=dict(size=36, color=text_color, family="Sarabun"),
+            showarrow=False
+        )
         
         fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20), font={'family': "Sarabun"})
         st.plotly_chart(fig, use_container_width=True)
