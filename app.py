@@ -287,7 +287,7 @@ def show_input_step1():
         </style>
     """, unsafe_allow_html=True)
     
-    st.markdown('<p style="color: #888; font-size: 1.1em; margin-bottom: 0;">ขั้นตอนที่ 2/2: การประเมิน</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #888; font-size: 1.1em; margin-bottom: 0;">ขั้นตอนที่ 1/2: การประเมิน</p>', unsafe_allow_html=True)
     
     # หัวข้อหลัก
     st.markdown("<h3 style='font-family: Sarabun; font-weight: 600; color: #1E3A8A;'>🧬 DNA ธุรกิจของท่าน</h3>", unsafe_allow_html=True)
