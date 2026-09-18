@@ -372,13 +372,14 @@ def show_input_step2():
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>ผู้ประกอบการและทีมงาน</p>", unsafe_allow_html=True)
             cap_netw = st.selectbox("ท่านใช้เครือข่ายหรือพันธมิตรในการดำเนินธุรกิจในระดับใด", score_options, index=0)
             csr3 = st.selectbox("กิจการของท่านมีระบบกำจัดของเสีย", binary_options, index=0)
-            ohr_career = st.selectbox("กิจการของท่านมีเส้นทางอาชีพให้พนักงานรับรู้", binary_options, index=0)
+            ohr_org = st.selectbox("กิจการของท่านมีผังโครงสร้างองค์กร", binary_options, index=0)
         
         with col2:
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>การบัญชีและอัตราส่วนการเงิน</p>", unsafe_allow_html=True)
             prc_cfw = st.selectbox("กระแสเงินสดเพื่อประกอบธุรกิจและชำระหนี้อยู่ในระดับใด", score_options, index=0)
-            Profitability_2567 = st.number_input("กำไรสุทธิต่อรายได้ (%)", value=0.00, format="%.2f", help="2567_Profitability_NetIncomePerTotalRevenue%")
-        
+            profitability_2567 = st.number_input("กำไรสุทธิต่อรายได้ (%)", value=0.00, format="%.2f", help="2567_Profitability_NetIncomePerTotalRevenue%")
+            liquidity_2567 = st.number_input("อัตราทุนหมุนเวียน (เท่า)", value=0.00, format="%.2f", help="2567_LiquidityRatio_CurrentRatio")
+            
         with col3:
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>เทคโนโลยีและเศรษฐกิจ</p>", unsafe_allow_html=True)
             ecm_net = st.selectbox("การเข้าถึงเครือข่ายอินเตอร์เน็ตของกิจการอยู่ในระดับใด", score_options, index=0)
