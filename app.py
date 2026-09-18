@@ -393,13 +393,14 @@ def show_input_step2():
         submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
 
         if submitted:
-            csr3_val = 1 if "มี" in csr3 else 0
+            ohr_org_val = 1 if "มี" in csr3 else 0
             ohr_career_val = 1 if "มี" in ohr_career else 0
+            ohr_target_val =1 if "มี" in ohr_target else 0
             
             st.session_state.inputs.update({
-                'CAP_NETW': cap_netw, 'CSR3': csr3_val, 'OHR_CAREER': ohr_career_val,
-                'PRC_CFW': prc_cfw, 'ECO_ADT': eco_adt,
-                'ECM_NET': ecm_net, 'RES_CH': res_ch,
+                'CAP_NETW': cap_netw, 'OHR_ORG': ohr_org_val, 'OHR_CAREER': ohr_career_val, 'OHR_target': ohr_target_val,
+                'PRC_CFW': prc_cfw, 'Profitability_2567': 2567_Profitability_NetIncomePerTotalRevenue%, 'liquidity_2567': 2567_LiquidityRatio_CurrentRatio, 'leverage_2567': 2567_LeverageRatio_TotalLiabilityPerEquity,
+                'ECM_NET': ecm_net, 'RES_CH': res_ch, 'ECO_ADT': eco_adt, 'CRI_REH'; cri_reh,
             })
             
             success = process_results()
