@@ -399,9 +399,8 @@ def show_input_step2():
             
             st.session_state.inputs.update({
                 'CAP_NETW': cap_netw, 'OHR_ORG': ohr_org_val, 'OHR_CAREER': ohr_career_val, 'OHR_target': ohr_target_val,
-                'ECM_NET': ecm_net, 'RES_CH': res_ch, 'ECO_ADT': eco_adt, 'CRI_REH'; cri_reh,
-                'ECM_NET': ecm_net, 'RES_CH': res_ch, 'ECO_ADT': eco_adt, 'CRI_REH'; cri_reh,
                 'PRC_CFW': prc_cfw, '2567_Profitability_NetIncomePerTotalRevenue%': Profitability_2567, '2567_LiquidityRatio_CurrentRatioliquidity_2567': liquidity_2567, '2567_LeverageRatio_TotalLiabilityPerEquity': leverage_2567,
+                'ECM_NET': ecm_net, 'RES_CH': res_ch, 'ECO_ADT': eco_adt, 'CRI_REH'; cri_reh,
             })
             
             success = process_results()
