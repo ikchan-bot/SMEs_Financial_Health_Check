@@ -392,21 +392,30 @@ def show_input_step2():
         st.markdown("---")
         submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
 
-        if submitted:
+if submitted:
             ohr_org_val = 1 if "มี" in ohr_org else 0
             ohr_career_val = 1 if "มี" in ohr_career else 0
-            ohr_target_val =1 if "มี" in ohr_target else 0
+            ohr_target_val = 1 if "มี" in ohr_target else 0
             
             st.session_state.inputs.update({
-                'CAP_NETW': cap_netw, 'OHR_ORG': ohr_org_val, 'OHR_CAREER': ohr_career_val, 'OHR_target': ohr_target_val,
-                'PRC_CFW': prc_cfw, '2567_Profitability_NetIncomePerTotalRevenue%': Profitability_2567, '2567_LiquidityRatio_CurrentRatioliquidity_2567': liquidity_2567, '2567_LeverageRatio_TotalLiabilityPerEquity': leverage_2567,
-                'ECM_NET': ecm_net, 'RES_CH': res_ch, 'ECO_ADT': eco_adt, 'CRI_REH': cri_reh,
+                'CAP_NETW': cap_netw, 
+                'OHR_ORG': ohr_org_val, 
+                'OHR_CAREER': ohr_career_val, 
+                'OHR_target': ohr_target_val,
+                'PRC_CFW': prc_cfw, 
+                '2567_Profitability_NetIncomePerTotalRevenue%': profitability_2567, 
+                '2567_LiquidityRatio_CurrentRatio': liquidity_2567, 
+                '2567_LeverageRatio_TotalLiabilityPerEquity': leverage_2567,
+                'ECM_NET': ecm_net, 
+                'RES_CH': res_ch, 
+                'ECO_ADT': eco_adt, 
+                'CRI_REH': cri_reh,
             })
             
             success = process_results()
             if success:
-                navigate_to('dashboard') 
-
+                navigate_to('dashboard')
+                
 # --- ฟังก์ชันประมวลผล (Processing Logic) ---
 def process_results():
     prob = 0.5
