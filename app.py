@@ -371,20 +371,23 @@ def show_input_step2():
         with col1:
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>ผู้ประกอบการและทีมงาน</p>", unsafe_allow_html=True)
             cap_netw = st.selectbox("ท่านใช้เครือข่ายหรือพันธมิตรในการดำเนินธุรกิจในระดับใด", score_options, index=0)
-            csr3 = st.selectbox("กิจการของท่านมีระบบกำจัดของเสีย", binary_options, index=0)
-            ohr_org = st.selectbox("กิจการของท่านมีผังโครงสร้างองค์กร", binary_options, index=0)
+            ohr_org = st.selectbox("กิจการของท่านมีผังโครงสร้างองค์กร", binary_options, index=0)            
+            ohr_career = st.selectbox("กิจการของท่านมีเส้นทางอาชีพให้พนักงานรับรู้", binary_options, index=0)
+            ohr_target = st.selectbox("กิจการของท่านมีการกำหนดเป้าหมายร่วมกัน", binary_options, index=0)
         
         with col2:
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>การบัญชีและอัตราส่วนการเงิน</p>", unsafe_allow_html=True)
             prc_cfw = st.selectbox("กระแสเงินสดเพื่อประกอบธุรกิจและชำระหนี้อยู่ในระดับใด", score_options, index=0)
             profitability_2567 = st.number_input("กำไรสุทธิต่อรายได้ (%)", value=0.00, format="%.2f", help="2567_Profitability_NetIncomePerTotalRevenue%")
             liquidity_2567 = st.number_input("อัตราทุนหมุนเวียน (เท่า)", value=0.00, format="%.2f", help="2567_LiquidityRatio_CurrentRatio")
+            leverage_2567 = st.number_input("อัตราหนี้สินต่อทุน (เท่า)", value=0.00, format="%.2f", help="2567_LeverageRatio_TotalLiabilityPerEquity")
             
         with col3:
             st.markdown("<p style='color: #1E3A8A; font-weight: bold;'>เทคโนโลยีและเศรษฐกิจ</p>", unsafe_allow_html=True)
             ecm_net = st.selectbox("การเข้าถึงเครือข่ายอินเตอร์เน็ตของกิจการอยู่ในระดับใด", score_options, index=0)
             res_ch = st.selectbox("ความสามารถในการโต้ตอบลูกค้าผ่านช่องทางต่าง ๆ อยู่ในระดับใด", score_options, index=0)
             eco_adt = st.selectbox("กิจการของท่านสามารถในการปรับตัวรับสถานการณ์เศรษฐกิจในระดับใด", score_options, index=0)
+            cri_reh = st.selectbox("กิจการของท่านมีการซ้อมแผนฉุกเฉินเป็นประจำทุกปี ", score_options, index=0)            
 
         st.markdown("---")
         submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
