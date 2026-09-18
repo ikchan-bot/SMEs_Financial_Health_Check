@@ -392,7 +392,7 @@ def show_input_step2():
         st.markdown("---")
         submitted = st.form_submit_button("🚀 ประเมินผลลัพธ์", type="primary", use_container_width=True)
 
-if submitted:
+        if submitted:
             ohr_org_val = 1 if "มี" in ohr_org else 0
             ohr_career_val = 1 if "มี" in ohr_career else 0
             ohr_target_val = 1 if "มี" in ohr_target else 0
