@@ -760,7 +760,7 @@ def show_recommendation():
     with col_rec2:
         st.markdown(f"""
             <div style='background-color: #FFF2CC; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
-            <p style='color: #c62828; font-size: 1.1em; margin-bottom: 10px;'><b>🚀 อัปเกรดด่วน:</b></p>
+            <p style='color: #c62828; font-size: 1.1em; margin-bottom: 10px;'><b>🚀 ปรับปรุงด่วน:</b></p>
             <p style='font-size: 0.95em; line-height: 1.5;'>{rec['urgent']}</p>
             </div>
         """, unsafe_allow_html=True)
